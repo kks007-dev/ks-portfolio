@@ -232,114 +232,122 @@ export default function Page(): JSX.Element {
   const projects: Project[] = [
     {
       id: 1,
-      name: 'S.T.A.R.S Portal',
-      type: 'Platform',
-      icon: '🌐',
-      iconBg: '#4B0082',
-      description: 'Founded a nonprofit and built a national learning portal for students to access hands-on STEM training and courses in CNC, 3D printing, and grant writing.',
-      relatedProjects: [2, 5, 9]
+      name: 'Zori',
+      type: 'Product',
+      icon: '⚡',
+      iconBg: '#5865F2',
+      description: 'Founding designer at the startup where we help people find professionals by recommendation',
+      relatedProjects: [2, 5, 13]
     },
     {
       id: 2,
-      name: 'Robo-Colts #9478',
-      type: 'Robotics',
-      icon: '🤖',
-      iconBg: '#6A5ACD',
-      description: 'Founded and captained a FRC team from my garage to World Championship. Built human-sized swerve drive robot, led software, hardware, and PR.',
-      relatedProjects: [1, 3, 6]
+      name: 'Sapera',
+      type: 'Product',
+      icon: 'S',
+      iconBg: '#4169E1',
+      description: 'Lead the design of a project management platform',
+      relatedProjects: [1, 4, 7]
     },
     {
       id: 3,
-      name: 'FTC Robotics Teams',
-      type: 'Robotics',
-      icon: '🛠️',
-      iconBg: '#7B68EE',
-      description: 'Led FTC teams as programmer and strategist, including school and partnered middle school teams. Designed OpenCV and spline-based autonomous movement.',
-      relatedProjects: [2, 4, 8]
+      name: '2+ items in an order at OLX',
+      type: 'Feature',
+      icon: '📦',
+      iconBg: '#6A5ACD',
+      description: 'Designed a way to purchase up to 5 items per deal on a platform that historically supported just 1',
+      relatedProjects: [9, 11, 12]
     },
     {
       id: 4,
-      name: 'TSA Engineering Design',
-      type: 'Competition',
-      icon: '🏗️',
-      iconBg: '#483D8B',
-      description: 'Placed 1st in Texas and Top 12 nationally for Engineering Design in the TSA National Conference. Submitted 8+ tech product innovations.',
-      relatedProjects: [3, 6, 10]
+      name: 'Style Setuper',
+      type: 'Product',
+      icon: 'Aa',
+      iconBg: '#7B68EE',
+      description: 'Created a Figma plugin that scans your frame and suggests text styles',
+      relatedProjects: [8, 12, 2]
     },
     {
       id: 5,
-      name: 'Diligence Platform',
-      type: 'Web App',
-      icon: '📊',
-      iconBg: '#8A2BE2',
-      description: 'Developed a financial analytics platform using TypeScript and Python that tracks indicators and trends for smart investing decisions.',
-      relatedProjects: [1, 7, 9]
+      name: 'thePenTool',
+      type: 'Website',
+      icon: '✒️',
+      iconBg: '#4B0082',
+      description: 'Founded thePenTool – online shop of UI design assets for designers that value their time',
+      relatedProjects: [1, 6, 13]
     },
     {
       id: 6,
-      name: 'FIRST Dean’s List Finalist',
-      type: 'Award',
-      icon: '🏆',
-      iconBg: '#9370DB',
-      description: 'Recognized as a FIRST Dean’s List Finalist at the World Championship for leadership, outreach, and innovation in robotics.',
-      relatedProjects: [2, 4, 10]
+      name: 'companies.tools 22 recap',
+      type: 'Website',
+      icon: '🔗',
+      iconBg: '#483D8B',
+      description: 'Designed and shipped a yearly recap for companies.tools',
+      relatedProjects: [5, 7, 13]
     },
     {
       id: 7,
-      name: 'CyberPatriot Semi-Finalist',
-      type: 'Competition',
-      icon: '🛡️',
-      iconBg: '#6495ED',
-      description: 'Led Windows Server defense team to Platinum tier in the nationwide Air Force CyberPatriot competition.',
-      relatedProjects: [5, 8, 11]
+      name: 'Obviously AI',
+      type: 'Website',
+      icon: '🔮',
+      iconBg: '#9370DB',
+      description: 'Designed a multi page marketing website for AI data prediction tool',
+      relatedProjects: [2, 6, 10]
     },
     {
       id: 8,
-      name: 'UH Biotech Internship',
-      type: 'Internship',
-      icon: '🧬',
+      name: 'Better File Thumbnails',
+      type: 'Product',
+      icon: '🖼️',
       iconBg: '#5865F2',
-      description: 'Interned on a genetics programming team modeling amino acids with VR/AR and multi-material 3D printing.',
-      relatedProjects: [3, 7, 9]
+      description: 'Created a Figma plugin that generates thumbnails to make it easier to find projects in the file browser',
+      relatedProjects: [4, 12, 3]
     },
     {
       id: 9,
-      name: 'RICE PATHS-UP Research',
-      type: 'Internship',
-      icon: '🔬',
-      iconBg: '#4169E1',
-      description: 'Researched digital electronics, camera vision AI, and printed circuits. Built ML models and worked in the clean room on micro-scale tech.',
-      relatedProjects: [1, 5, 8]
+      name: 'Buyer acceptance rate at OLX',
+      type: 'Feature',
+      icon: '🎯',
+      iconBg: '#6495ED',
+      description: 'Designed a fix for a problem of sellers rejecting purchases with payment in the post office',
+      relatedProjects: [3, 11, 10]
     },
     {
       id: 10,
-      name: 'I.D.R.O.N. Radiation Detector',
-      type: 'Hardware',
-      icon: '☢️',
-      iconBg: '#4B0082',
-      description: 'Engineered a solar-powered Geiger counter using custom PCB circuits and radiation detection technology.',
-      relatedProjects: [4, 6, 12]
+      name: 'CureRate',
+      type: 'Website',
+      icon: '⏱️',
+      iconBg: '#8A2BE2',
+      description: 'Designed a platform for people with chronic conditions to find and review products that helped',
+      relatedProjects: [7, 9, 13]
     },
     {
       id: 11,
-      name: 'NAACH Dance Production',
-      type: 'Arts',
-      icon: '💃',
-      iconBg: '#DC143C',
-      description: 'Performed and choreographed for statewide Bollywood showcases. Led costume/visual production for 8+ major dance acts.',
-      relatedProjects: [7, 12]
+      name: 'New deal confirmation experience at OLX',
+      type: 'Feature',
+      icon: '🔄',
+      iconBg: '#6A5ACD',
+      description: 'Redesigned the legacy flow of confirming a deal by seller',
+      relatedProjects: [3, 9, 12]
     },
     {
       id: 12,
-      name: 'Fusion Arts Team & Multicultural Society',
-      type: 'Arts',
-      icon: '🌍',
-      iconBg: '#FF69B4',
-      description: 'Co-founded school fusion dance team and brought Bollywood to district-wide stages. Advocated for cultural representation in arts.',
-      relatedProjects: [10, 11]
+      name: 'Handy Components',
+      type: 'Product',
+      icon: '🧩',
+      iconBg: '#7B68EE',
+      description: 'Created a Figma plugin that scans your file and inserts components mimicking the style of your UI',
+      relatedProjects: [4, 8, 11]
+    },
+    {
+      id: 13,
+      name: 'companies.tools',
+      type: 'Website',
+      icon: '🔧',
+      iconBg: '#483D8B',
+      description: 'Designed and launched a platform where teams share which apps and tools they use to work on their products',
+      relatedProjects: [5, 6, 1]
     }
   ];
-  
 
   // Get project features for constellation view
   const getProjectFeatures = (projectId: number) => {
@@ -438,15 +446,11 @@ export default function Page(): JSX.Element {
 
       {/* CSS for animations */}
       <style jsx global>{`
-        @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@400;500;600&display=swap');
-
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+        
         body {
-          font-family: 'Inter', sans-serif;
+          font-family: 'Space Grotesk', sans-serif;
           background-color: #000814;
-        }
-
-        h1, h2, h3, h4, h5, h6 {
-          font-family: 'DM Serif Display', serif;
         }
         
         /* Star twinkling animation */

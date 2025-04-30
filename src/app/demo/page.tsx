@@ -15,18 +15,6 @@ interface Project {
   constellationY?: number;
   // New property for related projects
   relatedProjects?: number[];
-  // New properties for constellation features
-  features?: ProjectFeature[];
-}
-
-// New type for project features in constellation view
-interface ProjectFeature {
-  id: string;
-  name: string;
-  description: string;
-  icon: string;
-  constellationX?: number;
-  constellationY?: number;
 }
 
 interface ChangelogItem {
@@ -36,29 +24,19 @@ interface ChangelogItem {
 }
 
 export default function Page(): JSX.Element {
-  // Use state with explicit initial values to prevent hydration issues
   const [selectedTab, setSelectedTab] = useState<string>('Work');
   const [scrollProgress, setScrollProgress] = useState<number>(0);
   const [hoveredCard, setHoveredCard] = useState<number | null>(null);
   const [selectedProject, setSelectedProject] = useState<number | null>(null);
   const [projectsVisible, setProjectsVisible] = useState<boolean>(false);
   const [constellationMode, setConstellationMode] = useState<boolean>(false);
-  const [isClient, setIsClient] = useState<boolean>(false);
-  const [hoveredFeature, setHoveredFeature] = useState<string | null>(null);
   
   const bannerRef = useRef<HTMLDivElement>(null);
   const projectsRef = useRef<HTMLDivElement>(null);
   const constellationRef = useRef<HTMLCanvasElement>(null);
   
-  // Fix hydration issues by marking component as client-rendered
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
-
   // Handle scroll animation for gradient fade and scroll animations
   useEffect(() => {
-    if (!isClient) return;
-    
     const handleScroll = () => {
       if (bannerRef.current) {
         const scrollY = window.scrollY;
@@ -84,50 +62,22 @@ export default function Page(): JSX.Element {
     setTimeout(() => handleScroll(), 100);
     
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [projectsVisible, isClient]);
+  }, [projectsVisible]);
 
-  // Generate features for constellation view
-  const generateProjectFeatures = (projectId: number): ProjectFeature[] => {
-    const featureIcons = ['💡', '⚙️', '🔍', '🚀', '📊', '🎨'];
-    const featureTypes = ['Core Feature', 'Technical', 'Innovation', 'Performance', 'Design', 'Integration'];
-    
-    // Generate 4-6 features based on project ID
-    const count = 4 + (projectId % 3);
-    const features: ProjectFeature[] = [];
-    
-    for (let i = 0; i < count; i++) {
-      features.push({
-        id: `feature-${projectId}-${i}`,
-        name: `${featureTypes[i % featureTypes.length]} ${i + 1}`,
-        description: `A ${featureTypes[i % featureTypes.length].toLowerCase()} aspect of this project`,
-        icon: featureIcons[i % featureIcons.length]
-      });
-    }
-    
-    return features;
-  };
-  
-  // Generate random positions for constellation features
-  const getRandomPositions = (projectId: number): ProjectFeature[] => {
-    const features = generateProjectFeatures(projectId);
-    
-    // Position features in a circular pattern around the center
-    return features.map((feature, index) => {
-      const angle = (index / features.length) * 2 * Math.PI;
-      const distance = 40; // Distance from center (percentage)
-      
+  // Generate random positions for constellation mode
+  const getRandomPositions = (projects: any) => {
+    return projects.map((project: any) => {
+      // Clone the project
       return {
-        ...feature,
-        constellationX: 50 + Math.cos(angle) * distance, // Center X + offset
-        constellationY: 50 + Math.sin(angle) * distance, // Center Y + offset
+        ...project,
+        constellationX: Math.random() * 80 + 10, // 10% to 90% of container width
+        constellationY: Math.random() * 80 + 10, // 10% to 90% of container height
       };
     });
   };
   
   // Generate constellation effect
   useEffect(() => {
-    if (!isClient) return;
-    
     if (constellationMode && selectedProject !== null && constellationRef.current) {
       const canvas = constellationRef.current;
       const ctx = canvas.getContext('2d');
@@ -157,53 +107,31 @@ export default function Page(): JSX.Element {
         // Find all visible constellation points
         const points = document.querySelectorAll('.constellation-point');
         
-        // Draw lines with improved style
+        // Draw lines
         ctx.beginPath();
-        ctx.strokeStyle = 'rgba(255, 255, 255, 0.85)'; // White lines
-        ctx.lineWidth = 2.5; // Thicker lines
+        ctx.strokeStyle = 'rgba(88, 101, 242, 0.6)';
+        ctx.lineWidth = 2;
         
         points.forEach((point) => {
           const pointRect = point.getBoundingClientRect();
           const endX = pointRect.left + pointRect.width / 2 - containerRect.left;
           const endY = pointRect.top + pointRect.height / 2 - containerRect.top;
           
-          // Draw line from center to feature
           ctx.moveTo(startX, startY);
           ctx.lineTo(endX, endY);
           
           // Add glow effect
-          ctx.shadowColor = 'rgba(255, 255, 255, 0.9)';
-          ctx.shadowBlur = 15;
-          ctx.stroke();
-          
-          // Reset path to avoid connecting all points
-          ctx.beginPath();
-          
-          // Draw circle endpoint
-          ctx.arc(endX, endY, 5, 0, 2 * Math.PI);
-          ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
-          ctx.fill();
-          
-          // Start new path for next line
-          ctx.beginPath();
-          ctx.moveTo(startX, startY);
+          ctx.shadowColor = 'rgba(88, 101, 242, 0.8)';
+          ctx.shadowBlur = 10;
         });
         
-        // Draw circle at the center point
-        ctx.beginPath();
-        ctx.arc(startX, startY, 8, 0, 2 * Math.PI);
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
-        ctx.shadowColor = 'rgba(255, 255, 255, 0.9)';
-        ctx.shadowBlur = 15;
-        ctx.fill();
+        ctx.stroke();
       }
     }
-  }, [constellationMode, selectedProject, isClient]);
+  }, [constellationMode, selectedProject]);
   
   // Handle window resize for constellation canvas
   useEffect(() => {
-    if (!isClient) return;
-    
     const handleResize = () => {
       if (constellationMode && constellationRef.current && projectsRef.current) {
         constellationRef.current.width = projectsRef.current.offsetWidth;
@@ -213,7 +141,7 @@ export default function Page(): JSX.Element {
     
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, [constellationMode, isClient]);
+  }, [constellationMode]);
   
   // Handle project selection
   const handleProjectClick = (projectId: number) => {
@@ -232,123 +160,136 @@ export default function Page(): JSX.Element {
   const projects: Project[] = [
     {
       id: 1,
-      name: 'S.T.A.R.S Portal',
-      type: 'Platform',
-      icon: '🌐',
-      iconBg: '#4B0082',
-      description: 'Founded a nonprofit and built a national learning portal for students to access hands-on STEM training and courses in CNC, 3D printing, and grant writing.',
-      relatedProjects: [2, 5, 9]
+      name: 'Zori',
+      type: 'Product',
+      icon: '⚡',
+      iconBg: '#5865F2',
+      description: 'Founding designer at the startup where we help people find professionals by recommendation',
+      relatedProjects: [2, 5, 13]
     },
     {
       id: 2,
-      name: 'Robo-Colts #9478',
-      type: 'Robotics',
-      icon: '🤖',
-      iconBg: '#6A5ACD',
-      description: 'Founded and captained a FRC team from my garage to World Championship. Built human-sized swerve drive robot, led software, hardware, and PR.',
-      relatedProjects: [1, 3, 6]
+      name: 'Sapera',
+      type: 'Product',
+      icon: 'S',
+      iconBg: '#4169E1',
+      description: 'Lead the design of a project management platform',
+      relatedProjects: [1, 4, 7]
     },
     {
       id: 3,
-      name: 'FTC Robotics Teams',
-      type: 'Robotics',
-      icon: '🛠️',
-      iconBg: '#7B68EE',
-      description: 'Led FTC teams as programmer and strategist, including school and partnered middle school teams. Designed OpenCV and spline-based autonomous movement.',
-      relatedProjects: [2, 4, 8]
+      name: '2+ items in an order at OLX',
+      type: 'Feature',
+      icon: '📦',
+      iconBg: '#6A5ACD',
+      description: 'Designed a way to purchase up to 5 items per deal on a platform that historically supported just 1',
+      relatedProjects: [9, 11, 12]
     },
     {
       id: 4,
-      name: 'TSA Engineering Design',
-      type: 'Competition',
-      icon: '🏗️',
-      iconBg: '#483D8B',
-      description: 'Placed 1st in Texas and Top 12 nationally for Engineering Design in the TSA National Conference. Submitted 8+ tech product innovations.',
-      relatedProjects: [3, 6, 10]
+      name: 'Style Setuper',
+      type: 'Product',
+      icon: 'Aa',
+      iconBg: '#7B68EE',
+      description: 'Created a Figma plugin that scans your frame and suggests text styles',
+      relatedProjects: [8, 12, 2]
     },
     {
       id: 5,
-      name: 'Diligence Platform',
-      type: 'Web App',
-      icon: '📊',
-      iconBg: '#8A2BE2',
-      description: 'Developed a financial analytics platform using TypeScript and Python that tracks indicators and trends for smart investing decisions.',
-      relatedProjects: [1, 7, 9]
+      name: 'thePenTool',
+      type: 'Website',
+      icon: '✒️',
+      iconBg: '#4B0082',
+      description: 'Founded thePenTool – online shop of UI design assets for designers that value their time',
+      relatedProjects: [1, 6, 13]
     },
     {
       id: 6,
-      name: 'FIRST Dean’s List Finalist',
-      type: 'Award',
-      icon: '🏆',
-      iconBg: '#9370DB',
-      description: 'Recognized as a FIRST Dean’s List Finalist at the World Championship for leadership, outreach, and innovation in robotics.',
-      relatedProjects: [2, 4, 10]
+      name: 'companies.tools 22 recap',
+      type: 'Website',
+      icon: '🔗',
+      iconBg: '#483D8B',
+      description: 'Designed and shipped a yearly recap for companies.tools',
+      relatedProjects: [5, 7, 13]
     },
     {
       id: 7,
-      name: 'CyberPatriot Semi-Finalist',
-      type: 'Competition',
-      icon: '🛡️',
-      iconBg: '#6495ED',
-      description: 'Led Windows Server defense team to Platinum tier in the nationwide Air Force CyberPatriot competition.',
-      relatedProjects: [5, 8, 11]
+      name: 'Obviously AI',
+      type: 'Website',
+      icon: '🔮',
+      iconBg: '#9370DB',
+      description: 'Designed a multi page marketing website for AI data prediction tool',
+      relatedProjects: [2, 6, 10]
     },
     {
       id: 8,
-      name: 'UH Biotech Internship',
-      type: 'Internship',
-      icon: '🧬',
+      name: 'Better File Thumbnails',
+      type: 'Product',
+      icon: '🖼️',
       iconBg: '#5865F2',
-      description: 'Interned on a genetics programming team modeling amino acids with VR/AR and multi-material 3D printing.',
-      relatedProjects: [3, 7, 9]
+      description: 'Created a Figma plugin that generates thumbnails to make it easier to find projects in the file browser',
+      relatedProjects: [4, 12, 3]
     },
     {
       id: 9,
-      name: 'RICE PATHS-UP Research',
-      type: 'Internship',
-      icon: '🔬',
-      iconBg: '#4169E1',
-      description: 'Researched digital electronics, camera vision AI, and printed circuits. Built ML models and worked in the clean room on micro-scale tech.',
-      relatedProjects: [1, 5, 8]
+      name: 'Buyer acceptance rate at OLX',
+      type: 'Feature',
+      icon: '🎯',
+      iconBg: '#6495ED',
+      description: 'Designed a fix for a problem of sellers rejecting purchases with payment in the post office',
+      relatedProjects: [3, 11, 10]
     },
     {
       id: 10,
-      name: 'I.D.R.O.N. Radiation Detector',
-      type: 'Hardware',
-      icon: '☢️',
-      iconBg: '#4B0082',
-      description: 'Engineered a solar-powered Geiger counter using custom PCB circuits and radiation detection technology.',
-      relatedProjects: [4, 6, 12]
+      name: 'CureRate',
+      type: 'Website',
+      icon: '⏱️',
+      iconBg: '#8A2BE2',
+      description: 'Designed a platform for people with chronic conditions to find and review products that helped',
+      relatedProjects: [7, 9, 13]
     },
     {
       id: 11,
-      name: 'NAACH Dance Production',
-      type: 'Arts',
-      icon: '💃',
-      iconBg: '#DC143C',
-      description: 'Performed and choreographed for statewide Bollywood showcases. Led costume/visual production for 8+ major dance acts.',
-      relatedProjects: [7, 12]
+      name: 'New deal confirmation experience at OLX',
+      type: 'Feature',
+      icon: '🔄',
+      iconBg: '#6A5ACD',
+      description: 'Redesigned the legacy flow of confirming a deal by seller',
+      relatedProjects: [3, 9, 12]
     },
     {
       id: 12,
-      name: 'Fusion Arts Team & Multicultural Society',
-      type: 'Arts',
-      icon: '🌍',
-      iconBg: '#FF69B4',
-      description: 'Co-founded school fusion dance team and brought Bollywood to district-wide stages. Advocated for cultural representation in arts.',
-      relatedProjects: [10, 11]
+      name: 'Handy Components',
+      type: 'Product',
+      icon: '🧩',
+      iconBg: '#7B68EE',
+      description: 'Created a Figma plugin that scans your file and inserts components mimicking the style of your UI',
+      relatedProjects: [4, 8, 11]
+    },
+    {
+      id: 13,
+      name: 'companies.tools',
+      type: 'Website',
+      icon: '🔧',
+      iconBg: '#483D8B',
+      description: 'Designed and launched a platform where teams share which apps and tools they use to work on their products',
+      relatedProjects: [5, 6, 1]
     }
   ];
-  
 
-  // Get project features for constellation view
-  const getProjectFeatures = (projectId: number) => {
-    return getRandomPositions(projectId);
+  // Get related projects for constellation view
+  const getRelatedProjects = (projectId: number) => {
+    const project = projects.find(p => p.id === projectId);
+    if (!project || !project.relatedProjects) return [];
+    
+    return project.relatedProjects.map(id => 
+      projects.find(p => p.id === id)
+    ).filter(p => p !== undefined) as Project[];
   };
 
-  // Constellation effect features (related to selected project)
-  const projectFeatures = selectedProject 
-    ? getProjectFeatures(selectedProject)
+  // Constellation effect projects (related to selected project)
+  const relatedProjects = selectedProject 
+    ? getRandomPositions(getRelatedProjects(selectedProject))
     : [];
 
   // Changelog data
@@ -377,11 +318,6 @@ export default function Page(): JSX.Element {
       content: 'Finished teaching my 2nd product design cohort at Projector Institute'
     }
   ];
-
-  // Don't render anything during SSR to prevent hydration errors
-  if (!isClient) {
-    return <div className="min-h-screen font-sans bg-black bg-opacity-95"></div>;
-  }
 
   return (
     <div className="min-h-screen font-sans bg-black bg-opacity-95">
@@ -438,15 +374,11 @@ export default function Page(): JSX.Element {
 
       {/* CSS for animations */}
       <style jsx global>{`
-        @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@400;500;600&display=swap');
-
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+        
         body {
-          font-family: 'Inter', sans-serif;
+          font-family: 'Space Grotesk', sans-serif;
           background-color: #000814;
-        }
-
-        h1, h2, h3, h4, h5, h6 {
-          font-family: 'DM Serif Display', serif;
         }
         
         /* Star twinkling animation */
@@ -483,9 +415,9 @@ export default function Page(): JSX.Element {
         }
 
         .project-card.selected {
-          border-color: rgba(255, 255, 255, 0.8);
+          border-color: rgba(88, 101, 242, 0.8);
           transform: translateY(-5px);
-          box-shadow: 0 10px 25px -5px rgba(255, 255, 255, 0.3);
+          box-shadow: 0 10px 25px -5px rgba(88, 101, 242, 0.3);
           z-index: 20;
         }
         
@@ -518,8 +450,6 @@ export default function Page(): JSX.Element {
           transition: all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
           z-index: 5;
           backdrop-filter: blur(4px);
-          border: 2px solid rgba(255, 255, 255, 0.3);
-          box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
         }
         
         .constellation-canvas {
@@ -561,17 +491,6 @@ export default function Page(): JSX.Element {
           background-color: rgba(255, 255, 255, 0.4);
           border-radius: 50%;
           pointer-events: none;
-        }
-        
-        /* Pulse animation for constellation points */
-        @keyframes pulse {
-          0% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.6); }
-          70% { box-shadow: 0 0 0 10px rgba(255, 255, 255, 0); }
-          100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
-        }
-        
-        .pulse {
-          animation: pulse 2s infinite;
         }
       `}</style>
       
@@ -649,7 +568,7 @@ export default function Page(): JSX.Element {
             <div className="bg-gray-900 bg-opacity-70 p-3 rounded-lg mb-6 backdrop-filter backdrop-blur-sm">
               <p className="text-white flex items-center font-mono">
                 <span className="mr-2">🇺🇦</span>
-                <span><span className="text-indigo-400">console.log(</span>"newest development: stars portal v2.2!"<span className="text-indigo-400">);</span></span>
+                <span><span className="text-indigo-400">console.log(</span>"newest development: stars portal"<span className="text-indigo-400">);</span></span>
               </p>
             </div>
 
@@ -718,47 +637,68 @@ export default function Page(): JSX.Element {
                     
                     {/* Selected Project Card */}
                     {selectedProject !== null && (
-                      <div
+                      <div 
                         id={`project-${selectedProject}`}
-                        className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-gray-900 bg-opacity-70 p-6 rounded-lg shadow-xl z-10 text-white project-card selected"
-                        style={{ width: '300px', textAlign: 'center' }}
+                        className="project-card selected bg-gray-900 bg-opacity-80 p-5 rounded-lg absolute backdrop-filter backdrop-blur-sm"
+                        style={{ 
+                          top: '50%',
+                          left: '50%',
+                          transform: 'translate(-50%, -50%)',
+                          width: '280px',
+                          zIndex: 10
+                        }}
                       >
-                        <div
-                          className="w-12 h-12 mx-auto mb-3 rounded-md flex items-center justify-center"
-                          style={{ backgroundColor: projects.find(p => p.id === selectedProject)?.iconBg }}
-                        >
-                          {projects.find(p => p.id === selectedProject)?.icon}
-                        </div>
-                        <h3 className="text-xl font-semibold">
-                          {projects.find(p => p.id === selectedProject)?.name}
-                        </h3>
-                        <p className="text-sm text-gray-300 mt-2">
-                          {projects.find(p => p.id === selectedProject)?.description}
-                        </p>
+                        {(() => {
+                          const project = projects.find(p => p.id === selectedProject);
+                          if (!project) return null;
+                          
+                          return (
+                            <div className="flex items-start">
+                              <div 
+                                className="w-10 h-10 rounded-md flex items-center justify-center text-white mr-3 flex-shrink-0"
+                                style={{ backgroundColor: project.iconBg }}
+                              >
+                                {project.icon}
+                              </div>
+                              <div>
+                                <h3 className="text-white font-medium">{project.name}</h3>
+                                <p className="text-gray-300 text-sm mt-1">{project.description}</p>
+                                <div className="mt-3">
+                                  <span className="inline-block bg-gray-800 text-xs text-blue-300 px-2 py-1 rounded font-mono border border-gray-700">
+                                    <span className="mr-1">🔭</span>{project.type}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })()}
                       </div>
                     )}
-
-                    {/* Feature Nodes (Constellation Points) */}
-                    {projectFeatures.map((feature, index) => (
-                      <div
-                        key={feature.id}
-                        className="constellation-point bg-gray-800 p-3 rounded-lg text-white text-sm text-center pulse"
+                    
+                    {/* Related Project Cards */}
+                    {relatedProjects.map((project: any) => (
+                      <div 
+                        key={`constellation-${project.id}`}
+                        className="constellation-point bg-gray-900 bg-opacity-70 p-3 rounded-lg shadow-lg"
                         style={{
-                          left: `${feature.constellationX}%`,
-                          top: `${feature.constellationY}%`,
+                          top: `${project.constellationY}%`,
+                          left: `${project.constellationX}%`,
                           width: '140px',
-                          transform: 'translate(-50%, -50%)',
+                          transform: 'translate(-50%, -50%)'
                         }}
-                        onMouseEnter={() => setHoveredFeature(feature.id)}
-                        onMouseLeave={() => setHoveredFeature(null)}
                       >
-                        <div className="text-xl mb-1">{feature.icon}</div>
-                        <div className="font-semibold">{feature.name}</div>
-                        {hoveredFeature === feature.id && (
-                          <div className="text-xs mt-1 text-gray-400">
-                            {feature.description}
+                        <div className="flex items-center">
+                          <div 
+                            className="w-8 h-8 rounded-md flex items-center justify-center text-white text-sm"
+                            style={{ backgroundColor: project.iconBg }}
+                          >
+                            {project.icon}
                           </div>
-                        )}
+                          <div className="ml-2">
+                            <h3 className="text-white text-xs font-medium">{project.name}</h3>
+                            <p className="text-gray-400 text-xs truncate">{project.type}</p>
+                          </div>
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -766,28 +706,48 @@ export default function Page(): JSX.Element {
               </div>
             </div>
 
-            {/* Changelog Section */}
-            <div className="mt-16">
-              <div className="text-gray-400 mb-2 font-mono flex items-center">
-                <span className="mr-2">📜</span>
-                <span className="text-blue-400">const</span> changelog = []
-              </div>
-              <ul className="space-y-4">
-                {changelog.map((entry, index) => (
-                  <li key={index} className="text-gray-300">
-                    <span className="text-gray-500 font-mono text-sm mr-2">// {entry.date}</span>
-                    <span>{entry.content}</span>
-                    {entry.link && (
-                      <span className="ml-1 text-indigo-400 hover:underline cursor-pointer">
-                        {entry.link}
-                      </span>
-                    )}
-                  </li>
+            {/* Bottom navigation (only shown at smaller screens) */}
+            <div className="flex justify-center mb-10 lg:hidden">
+              <div className="bg-gray-800 bg-opacity-70 inline-flex rounded-lg backdrop-filter backdrop-blur-sm">
+                {['Work', 'About', 'Lab'].map(tab => (
+                  <button
+                    key={tab}
+                    className={`px-6 py-3 ${selectedTab === tab ? 'text-white' : 'text-gray-400'} flex items-center`}
+                    onClick={() => setSelectedTab(tab)}
+                  >
+                    {tab === 'Work' && <span className="mr-2">🚀</span>}
+                    {tab === 'About' && <span className="mr-2">👨‍🚀</span>}
+                    {tab === 'Lab' && <span className="mr-2">🧪</span>}
+                    {tab}
+                  </button>
                 ))}
-              </ul>
+              </div>
+            </div>
+            
+            {/* Changelog section */}
+            <div className="mb-10">
+              <div className="text-gray-400 mb-4 font-mono flex items-center">
+                <span className="mr-2">📡</span>
+                <span className="text-blue-400">Object</span> changelog
+              </div>
+              
+              <div className="space-y-4">
+                {changelog.map((item, idx) => (
+                  <div 
+                    key={idx} 
+                    className="bg-gray-900 bg-opacity-60 p-4 rounded-lg border-l-4 border-indigo-500"
+                  >
+                    <div className="text-xs text-blue-300 font-mono mb-1">{item.date}</div>
+                    <div className="text-white">
+                      {item.content}
+                      {item.link && <a href="#" className="text-indigo-400 hover:underline ml-1">{item.link}</a>}
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
-
+          
           {/* Right column (sidebar) */}
           <div className="lg:w-72 space-y-6">
             {/* Navigation Menu (only shown at larger screens) */}
