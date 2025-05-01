@@ -1,64 +1,40 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useRef, JSX } from 'react';
+import React, { useState, useEffect, useRef } from "react";
+import { motion } from "framer-motion";
+import Link from "next/link";
 
-// Type definitions
-interface Project {
-  id: number;
-  name: string;
-  type: string;
-  icon: string;
-  iconBg: string;
-  description: string;
-  // New position properties for constellation effect
-  constellationX?: number;
-  constellationY?: number;
-  // New property for related projects
-  relatedProjects?: number[];
-  // New properties for constellation features
-  features?: ProjectFeature[];
-}
+export default function About() {
+  const [showEmail, setShowEmail] = useState(false);
+  const [showContext, setShowContext] = useState(true);
+  const [scrollProgress, setScrollProgress] = useState(0);
+  const bannerRef = useRef(null);
 
-// New type for project features in constellation view
-interface ProjectFeature {
-  id: string;
-  name: string;
-  description: string;
-  icon: string;
-  constellationX?: number;
-  constellationY?: number;
-}
-
-interface ChangelogItem {
-  date: string;
-  content: string;
-  link?: string;
-}
-
-export default function Page(): JSX.Element {
-  // Use state with explicit initial values to prevent hydration issues
-  const [selectedTab, setSelectedTab] = useState<string>('Work');
-  const [scrollProgress, setScrollProgress] = useState<number>(0);
-  const [hoveredCard, setHoveredCard] = useState<number | null>(null);
-  const [selectedProject, setSelectedProject] = useState<number | null>(null);
-  const [projectsVisible, setProjectsVisible] = useState<boolean>(false);
-  const [constellationMode, setConstellationMode] = useState<boolean>(false);
-  const [isClient, setIsClient] = useState<boolean>(false);
-  const [hoveredFeature, setHoveredFeature] = useState<string | null>(null);
-  
-  const bannerRef = useRef<HTMLDivElement>(null);
-  const projectsRef = useRef<HTMLDivElement>(null);
-  const constellationRef = useRef<HTMLCanvasElement>(null);
-  
-  // Fix hydration issues by marking component as client-rendered
+  // Handle keyboard events for email reveal
   useEffect(() => {
-    setIsClient(true);
+    const handleKeyDown = (e:any) => {
+      if (e.key.toLowerCase() === "e") {
+        setShowEmail(true);
+      }
+    };
+
+    const handleKeyUp = (e:any) => {
+      if (e.key.toLowerCase() === "e") {
+        setShowEmail(false);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("keyup", handleKeyUp);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("keyup", handleKeyUp);
+    };
   }, []);
 
-  // Handle scroll animation for gradient fade and scroll animations
+  // Handle scroll for banner effect
   useEffect(() => {
-    if (!isClient) return;
-    
     const handleScroll = () => {
       if (bannerRef.current) {
         const scrollY = window.scrollY;
@@ -69,545 +45,35 @@ export default function Page(): JSX.Element {
         const progress = Math.min(Math.max((scrollY - triggerPoint) / fadeDistance, 0), 1);
         setScrollProgress(progress);
       }
-      
-      // Trigger projects visibility when user scrolls past a certain point
-      if (projectsRef.current && !projectsVisible) {
-        const rect = projectsRef.current.getBoundingClientRect();
-        if (rect.top < window.innerHeight * 0.8) {
-          setProjectsVisible(true);
-        }
-      }
     };
-    
-    window.addEventListener('scroll', handleScroll);
-    // Initial check for elements in viewport on load
-    setTimeout(() => handleScroll(), 100);
-    
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [projectsVisible, isClient]);
 
-  // Generate features for constellation view
-  const generateProjectFeatures = (projectId: number): ProjectFeature[] => {
-    const featureIcons = ['💡', '⚙️', '🔍', '🚀', '📊', '🎨'];
-    const featureTypes = ['Core Feature', 'Technical', 'Innovation', 'Performance', 'Design', 'Integration'];
-    
-    // Generate 4-6 features based on project ID
-    const count = 4 + (projectId % 3);
-    const features: ProjectFeature[] = [];
-    
-    for (let i = 0; i < count; i++) {
-      features.push({
-        id: `feature-${projectId}-${i}`,
-        name: `${featureTypes[i % featureTypes.length]} ${i + 1}`,
-        description: `A ${featureTypes[i % featureTypes.length].toLowerCase()} aspect of this project`,
-        icon: featureIcons[i % featureIcons.length]
-      });
-    }
-    
-    return features;
-  };
-  
-  // Generate random positions for constellation features
-  const getRandomPositions = (projectId: number): ProjectFeature[] => {
-    const features = generateProjectFeatures(projectId);
-    
-    // Position features in a circular pattern around the center
-    return features.map((feature, index) => {
-      const angle = (index / features.length) * 2 * Math.PI;
-      const distance = 40; // Distance from center (percentage)
-      
-      return {
-        ...feature,
-        constellationX: 50 + Math.cos(angle) * distance, // Center X + offset
-        constellationY: 50 + Math.sin(angle) * distance, // Center Y + offset
-      };
-    });
-  };
-  
-  // Generate constellation effect
-  useEffect(() => {
-    if (!isClient) return;
-    
-    if (constellationMode && selectedProject !== null && constellationRef.current) {
-      const canvas = constellationRef.current;
-      const ctx = canvas.getContext('2d');
-      
-      if (!ctx) return;
-      
-      // Set canvas dimensions to match container
-      const container = projectsRef.current;
-      if (container) {
-        canvas.width = container.offsetWidth;
-        canvas.height = container.offsetHeight;
-        
-        // Clear canvas
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        
-        // Find the selected project's element
-        const selectedElement = document.getElementById(`project-${selectedProject}`);
-        if (!selectedElement) return;
-        
-        // Get center point of selected element
-        const selectedRect = selectedElement.getBoundingClientRect();
-        const containerRect = container.getBoundingClientRect();
-        
-        const startX = selectedRect.left + selectedRect.width / 2 - containerRect.left;
-        const startY = selectedRect.top + selectedRect.height / 2 - containerRect.top;
-        
-        // Find all visible constellation points
-        const points = document.querySelectorAll('.constellation-point');
-        
-        // Draw lines with improved style
-        ctx.beginPath();
-        ctx.strokeStyle = 'rgba(255, 255, 255, 0.85)'; // White lines
-        ctx.lineWidth = 2.5; // Thicker lines
-        
-        points.forEach((point) => {
-          const pointRect = point.getBoundingClientRect();
-          const endX = pointRect.left + pointRect.width / 2 - containerRect.left;
-          const endY = pointRect.top + pointRect.height / 2 - containerRect.top;
-          
-          // Draw line from center to feature
-          ctx.moveTo(startX, startY);
-          ctx.lineTo(endX, endY);
-          
-          // Add glow effect
-          ctx.shadowColor = 'rgba(255, 255, 255, 0.9)';
-          ctx.shadowBlur = 15;
-          ctx.stroke();
-          
-          // Reset path to avoid connecting all points
-          ctx.beginPath();
-          
-          // Draw circle endpoint
-          ctx.arc(endX, endY, 5, 0, 2 * Math.PI);
-          ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
-          ctx.fill();
-          
-          // Start new path for next line
-          ctx.beginPath();
-          ctx.moveTo(startX, startY);
-        });
-        
-        // Draw circle at the center point
-        ctx.beginPath();
-        ctx.arc(startX, startY, 8, 0, 2 * Math.PI);
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
-        ctx.shadowColor = 'rgba(255, 255, 255, 0.9)';
-        ctx.shadowBlur = 15;
-        ctx.fill();
-      }
-    }
-  }, [constellationMode, selectedProject, isClient]);
-  
-  // Handle window resize for constellation canvas
-  useEffect(() => {
-    if (!isClient) return;
-    
-    const handleResize = () => {
-      if (constellationMode && constellationRef.current && projectsRef.current) {
-        constellationRef.current.width = projectsRef.current.offsetWidth;
-        constellationRef.current.height = projectsRef.current.offsetHeight;
-      }
-    };
-    
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, [constellationMode, isClient]);
-  
-  // Handle project selection
-  const handleProjectClick = (projectId: number) => {
-    if (selectedProject === projectId) {
-      // Deselect and exit constellation mode
-      setSelectedProject(null);
-      setConstellationMode(false);
-    } else {
-      // Select project and enter constellation mode
-      setSelectedProject(projectId);
-      setConstellationMode(true);
-    }
-  };
-  
-  // Example projects data with added related projects
-  const projects: Project[] = [
-    {
-      id: 1,
-      name: 'Zori',
-      type: 'Product',
-      icon: '⚡',
-      iconBg: '#5865F2',
-      description: 'Founding designer at the startup where we help people find professionals by recommendation',
-      relatedProjects: [2, 5, 13]
-    },
-    {
-      id: 2,
-      name: 'Sapera',
-      type: 'Product',
-      icon: 'S',
-      iconBg: '#4169E1',
-      description: 'Lead the design of a project management platform',
-      relatedProjects: [1, 4, 7]
-    },
-    {
-      id: 3,
-      name: '2+ items in an order at OLX',
-      type: 'Feature',
-      icon: '📦',
-      iconBg: '#6A5ACD',
-      description: 'Designed a way to purchase up to 5 items per deal on a platform that historically supported just 1',
-      relatedProjects: [9, 11, 12]
-    },
-    {
-      id: 4,
-      name: 'Style Setuper',
-      type: 'Product',
-      icon: 'Aa',
-      iconBg: '#7B68EE',
-      description: 'Created a Figma plugin that scans your frame and suggests text styles',
-      relatedProjects: [8, 12, 2]
-    },
-    {
-      id: 5,
-      name: 'thePenTool',
-      type: 'Website',
-      icon: '✒️',
-      iconBg: '#4B0082',
-      description: 'Founded thePenTool – online shop of UI design assets for designers that value their time',
-      relatedProjects: [1, 6, 13]
-    },
-    {
-      id: 6,
-      name: 'companies.tools 22 recap',
-      type: 'Website',
-      icon: '🔗',
-      iconBg: '#483D8B',
-      description: 'Designed and shipped a yearly recap for companies.tools',
-      relatedProjects: [5, 7, 13]
-    },
-    {
-      id: 7,
-      name: 'Obviously AI',
-      type: 'Website',
-      icon: '🔮',
-      iconBg: '#9370DB',
-      description: 'Designed a multi page marketing website for AI data prediction tool',
-      relatedProjects: [2, 6, 10]
-    },
-    {
-      id: 8,
-      name: 'Better File Thumbnails',
-      type: 'Product',
-      icon: '🖼️',
-      iconBg: '#5865F2',
-      description: 'Created a Figma plugin that generates thumbnails to make it easier to find projects in the file browser',
-      relatedProjects: [4, 12, 3]
-    },
-    {
-      id: 9,
-      name: 'Buyer acceptance rate at OLX',
-      type: 'Feature',
-      icon: '🎯',
-      iconBg: '#6495ED',
-      description: 'Designed a fix for a problem of sellers rejecting purchases with payment in the post office',
-      relatedProjects: [3, 11, 10]
-    },
-    {
-      id: 10,
-      name: 'CureRate',
-      type: 'Website',
-      icon: '⏱️',
-      iconBg: '#8A2BE2',
-      description: 'Designed a platform for people with chronic conditions to find and review products that helped',
-      relatedProjects: [7, 9, 13]
-    },
-    {
-      id: 11,
-      name: 'New deal confirmation experience at OLX',
-      type: 'Feature',
-      icon: '🔄',
-      iconBg: '#6A5ACD',
-      description: 'Redesigned the legacy flow of confirming a deal by seller',
-      relatedProjects: [3, 9, 12]
-    },
-    {
-      id: 12,
-      name: 'Handy Components',
-      type: 'Product',
-      icon: '🧩',
-      iconBg: '#7B68EE',
-      description: 'Created a Figma plugin that scans your file and inserts components mimicking the style of your UI',
-      relatedProjects: [4, 8, 11]
-    },
-    {
-      id: 13,
-      name: 'companies.tools',
-      type: 'Website',
-      icon: '🔧',
-      iconBg: '#483D8B',
-      description: 'Designed and launched a platform where teams share which apps and tools they use to work on their products',
-      relatedProjects: [5, 6, 1]
-    }
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // Work history data
+  const workHistory = [
+    { company: "Wix", period: "Aug 2023 — Now" },
+    { company: "Zori", period: "Nov 2020 — Now" },
+    { company: "OLX Ukraine (via Rebbix)", period: "Nov 2021 — Jun 2023" },
+    { company: "ELEKS", period: "Jul 2017 — Oct 2021" },
+    { company: "Finsweet", period: "May 2020 — Oct 2020" },
+    { company: "dops.digital", period: "Jan 2017 — Jul 2017" },
   ];
-
-  // Get project features for constellation view
-  const getProjectFeatures = (projectId: number) => {
-    return getRandomPositions(projectId);
-  };
-
-  // Constellation effect features (related to selected project)
-  const projectFeatures = selectedProject 
-    ? getProjectFeatures(selectedProject)
-    : [];
-
-  // Changelog data
-  const changelog: ChangelogItem[] = [
-    {
-      date: 'February 17, 2024',
-      content: 'Hacked together an interactive new concept: ',
-      link: 'drag to open links »'
-    },
-    {
-      date: 'January 13, 2024',
-      content: 'Sold my startup ',
-      link: 'companies.tools »'
-    },
-    {
-      date: 'December 12, 2023',
-      content: 'Started teaching my 3rd product design cohort at ',
-      link: 'Projector Institute »'
-    },
-    {
-      date: 'December 5, 2023',
-      content: 'Received a grant from Figma for the Style Setuper plugin'
-    },
-    {
-      date: 'November 15, 2023',
-      content: 'Finished teaching my 2nd product design cohort at Projector Institute'
-    }
-  ];
-
-  // Don't render anything during SSR to prevent hydration errors
-  if (!isClient) {
-    return <div className="min-h-screen font-sans bg-black bg-opacity-95"></div>;
-  }
 
   return (
-    <div className="min-h-screen font-sans bg-black bg-opacity-95">
-      {/* Space background with stars */}
-      <div className="fixed top-0 left-0 w-full h-full pointer-events-none z-0">
-        {/* Small stars */}
-        {Array.from({ length: 100 }).map((_, i) => (
-          <div 
-            key={`star-sm-${i}`} 
-            className="absolute rounded-full bg-white"
-            style={{
-              width: '2px',
-              height: '2px',
-              top: `${Math.random() * 100}%`,
-              left: `${Math.random() * 100}%`,
-              opacity: Math.random() * 0.8 + 0.2,
-              animation: `twinkle ${Math.random() * 5 + 5}s ease-in-out infinite`
-            }}
-          />
-        ))}
-        
-        {/* Medium stars */}
-        {Array.from({ length: 50 }).map((_, i) => (
-          <div 
-            key={`star-md-${i}`} 
-            className="absolute rounded-full bg-white"
-            style={{
-              width: '3px',
-              height: '3px',
-              top: `${Math.random() * 100}%`,
-              left: `${Math.random() * 100}%`,
-              opacity: Math.random() * 0.8 + 0.2,
-              animation: `twinkle ${Math.random() * 7 + 3}s ease-in-out infinite`
-            }}
-          />
-        ))}
-        
-        {/* Large stars */}
-        {Array.from({ length: 20 }).map((_, i) => (
-          <div 
-            key={`star-lg-${i}`} 
-            className="absolute rounded-full bg-white"
-            style={{
-              width: '4px',
-              height: '4px',
-              top: `${Math.random() * 100}%`,
-              left: `${Math.random() * 100}%`,
-              opacity: Math.random() * 0.8 + 0.2,
-              animation: `twinkle ${Math.random() * 9 + 2}s ease-in-out infinite`
-            }}
-          />
-        ))}
-      </div>
-
-      {/* CSS for animations */}
-      <style jsx global>{`
-        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
-        
-        body {
-          font-family: 'Space Grotesk', sans-serif;
-          background-color: #000814;
-        }
-        
-        /* Star twinkling animation */
-        @keyframes twinkle {
-          0%, 100% { opacity: 0.2; }
-          50% { opacity: 1; }
-        }
-        
-        /* Nebula effect for gradient */
-        .nebula-gradient {
-          background: linear-gradient(45deg, #05000f, #05103f, #092466, #0c348f);
-          background-size: 400% 400%;
-          animation: nebula-shift 15s ease infinite;
-        }
-        
-        @keyframes nebula-shift {
-          0% { background-position: 0% 50%; }
-          50% { background-position: 100% 50%; }
-          100% { background-position: 0% 50%; }
-        }
-        
-        /* Card interactions */
-        .project-card {
-          transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-          border: 2px solid transparent;
-          cursor: pointer;
-          backdrop-filter: blur(4px);
-        }
-        
-        .project-card:hover {
-          transform: translateY(-5px);
-          box-shadow: 0 10px 25px -5px rgba(88, 101, 242, 0.3);
-          z-index: 10;
-        }
-
-        .project-card.selected {
-          border-color: rgba(255, 255, 255, 0.8);
-          transform: translateY(-5px);
-          box-shadow: 0 10px 25px -5px rgba(255, 255, 255, 0.3);
-          z-index: 20;
-        }
-        
-        /* Fade other cards when one is hovered */
-        .project-card-dimmed {
-          filter: brightness(0.7);
-          transform: scale(0.98);
-        }
-        
-        /* Projects reveal animation */
-        .projects-container {
-          opacity: 0;
-          transform: translateY(30px);
-          transition: opacity 0.8s ease, transform 0.8s ease;
-        }
-        
-        .projects-container.visible {
-          opacity: 1;
-          transform: translateY(0);
-        }
-        
-        /* Constellation cards */
-        .constellation-container {
-          position: relative;
-          height: 600px;
-        }
-        
-        .constellation-point {
-          position: absolute;
-          transition: all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-          z-index: 5;
-          backdrop-filter: blur(4px);
-          border: 2px solid rgba(255, 255, 255, 0.3);
-          box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
-        }
-        
-        .constellation-canvas {
-          position: absolute;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          pointer-events: none;
-          z-index: 4;
-        }
-        
-        /* Exit constellation button */
-        .exit-constellation {
-          position: absolute;
-          top: 20px;
-          right: 20px;
-          z-index: 30;
-          transition: all 0.3s ease;
-        }
-        
-        .exit-constellation:hover {
-          transform: scale(1.1);
-        }
-        
-        /* Stagger reveal animation for cards */
-        .constellation-point:nth-child(1) { transition-delay: 50ms; }
-        .constellation-point:nth-child(2) { transition-delay: 100ms; }
-        .constellation-point:nth-child(3) { transition-delay: 150ms; }
-        .constellation-point:nth-child(4) { transition-delay: 200ms; }
-        .constellation-point:nth-child(5) { transition-delay: 250ms; }
-        .constellation-point:nth-child(6) { transition-delay: 300ms; }
-        
-        /* Particle effect */
-        .particle {
-          position: absolute;
-          width: 2px;
-          height: 2px;
-          background-color: rgba(255, 255, 255, 0.4);
-          border-radius: 50%;
-          pointer-events: none;
-        }
-        
-        /* Pulse animation for constellation points */
-        @keyframes pulse {
-          0% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.6); }
-          70% { box-shadow: 0 0 0 10px rgba(255, 255, 255, 0); }
-          100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
-        }
-        
-        .pulse {
-          animation: pulse 2s infinite;
-        }
-      `}</style>
-      
+    <div className="min-h-screen text-white relative overflow-x-hidden">
       {/* Gradient Banner */}
       <div 
-        ref={bannerRef}
-        className="w-full relative overflow-hidden z-10" 
+        ref={bannerRef} 
+        className="w-full relative overflow-hidden z-10"
         style={{ 
           paddingTop: '2rem', 
-          paddingBottom: '2rem',
-          transition: 'background 0.2s ease-out'
+          paddingBottom: '2rem', 
+          transition: 'background 0.2s ease-out' 
         }}
       >
-        <div className="absolute top-0 left-0 w-full h-full nebula-gradient opacity-80"></div>
-        
-        {/* Space decorations */}
-        <div className="absolute top-0 left-0 w-full h-full opacity-20 pointer-events-none">
-          <div className="absolute top-6 left-4 text-xl">🚀</div>
-          <div className="absolute top-10 right-10 text-xl">🛰️</div>
-          <div className="absolute bottom-8 left-1/4 text-xl">🌌</div>
-          <div className="absolute top-1/3 right-1/3 text-xl">💫</div>
-          <div className="absolute bottom-4 right-1/4 text-xl">⭐</div>
-          
-          {/* Code-like decorations */}
-          <div className="absolute top-5 left-1/3 text-xs text-blue-300">{'<cosmos class="infinite">'}</div>
-          <div className="absolute top-16 left-1/5 text-xs text-purple-300">{'function explore() {'}</div>
-          <div className="absolute bottom-12 left-2/3 text-xs text-blue-300">{'const engineer = new SpaceEngineer();'}</div>
-          <div className="absolute right-36 top-8 text-xs text-indigo-300">{'/* Engineering across the stars */'}</div>
-          <div className="absolute bottom-6 left-16 text-xs text-purple-300">{'}</div>'}</div>
-        </div>
-
-        <div className="max-w-7xl mx-auto px-4 relative">
+       <div className="max-w-7xl mx-auto px-4 relative">
           {/* Header */}
           <header className="flex flex-col md:flex-row justify-between items-start">
             <div>
@@ -620,341 +86,441 @@ export default function Page(): JSX.Element {
             <div className="mt-4 md:mt-0 text-right">
               <p className="text-gray-300">Researching, prototyping, designing and testing <span className="text-gray-400">by day</span></p>
               <p className="text-gray-300">coding, no-coding, launching products <span className="text-gray-400">by night</span></p>
-              <a href="mailto:krishksingh07@gmail.com" className="block mt-2 text-white hover:underline">krishksingh07@gmail.com</a>
+              <div className="text-left md:text-right mt-4 md:mt-0">
+             
+              {showEmail ? (
+                <motion.p 
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="text-blue-400"
+                >
+                  krishksingh07@gmail.com
+                </motion.p>
+              ) : (
+                <p className="text-gray-500 text-sm">Press E to see email</p>
+              )}
+            </div>
             </div>
           </header>
+        </div> <div className="absolute top-0 left-0 w-full h-full nebula-gradient opacity-80"></div>
+        <div 
+          className="max-w-6xl mx-auto px-4 md:px-8 relative z-10"
+          style={{ opacity: 1 - scrollProgress * 0.8 }}
+        >
         </div>
       </div>
-      {/* Border line */}
-      <div className="w-full h-px bg-indigo-900"></div>
-      
-      <div className="max-w-7xl mx-auto px-4 py-10 relative z-10">
-        {/* Main content layout with two columns */}
-        <div className="flex flex-col lg:flex-row lg:space-x-8">
-          {/* Left column (main content) */}
-          <div className="flex-1">
-            {/* Visitor counter */}
-            <div className="flex items-center mb-4">
-              <span className="text-gray-400 mr-2 flex items-center">
-                <span className="mr-1">👨‍🚀</span> 
-                Hello, explorer
-              </span>
-              <div className="flex">
-                {[4, 3, 5, 8].map((num, idx) => (
-                  <div key={idx} className="bg-gray-900 w-6 h-6 flex items-center justify-center rounded-sm mx-0.5 text-blue-400 text-sm font-mono border border-gray-800">
-                    {num}
-                  </div>
-                ))}
-              </div>
-              <span className="text-xs text-gray-500 ml-2 font-mono">// visitor_id</span>
+
+      {/* Main Content */}
+      <div className="relative z-20 pb-32"> {/* Added bottom padding to prevent overlap with fixed elements */}
+        {/* Header */}
+        
+        <header className="max-w-6xl mx-auto p-4 pt-8 md:p-8">
+          <div className="flex flex-col items-start">
+         
+          </div>
+          
+          <div className="mt-8 flex flex-col md:flex-row justify-between items-start md:items-center">
+            <div>
             </div>
+            
+          </div>
+        </header>
 
-            {/* Ukraine support notice */}
-            <div className="bg-gray-900 bg-opacity-70 p-3 rounded-lg mb-6 backdrop-filter backdrop-blur-sm">
-              <p className="text-white flex items-center font-mono">
-                <span className="mr-2">🇺🇦</span>
-                <span><span className="text-indigo-400">console.log(</span>"newest development: stars portal v2.2!"<span className="text-indigo-400">);</span></span>
-              </p>
+        {/* Work Experience Section */}
+        <section className="max-w-6xl mx-auto p-4 md:p-8 mt-8">
+          <div className="flex flex-col md:flex-row md:items-center gap-2 mb-6">
+            <h2 className="text-2xl font-bold">Where I've worked</h2>
+            <div className="flex space-x-2 mt-2 md:mt-0 md:ml-4">
+              <button 
+                className={`${showContext ? 'bg-gray-800' : 'bg-gray-900'} hover:bg-gray-700 text-sm px-3 py-1 rounded-md`}
+                onClick={() => setShowContext(true)}
+              >
+                Give me context
+              </button>
+              <button 
+                className={`${!showContext ? 'bg-gray-800' : 'bg-gray-900'} hover:bg-gray-700 text-sm px-3 py-1 rounded-md`}
+                onClick={() => setShowContext(false)}
+              >
+                Just show me the list
+              </button>
             </div>
+          </div>
 
-            {/* Selected projects section */}
-            <div className="mb-10" ref={projectsRef}>
-              <div className="text-gray-400 mb-4 font-mono flex items-center">
-                <span className="mr-2">🛰️</span>
-                <span className="text-blue-400">Array</span>
-                <span className="text-white">(</span>
-                <span className="text-purple-400">13</span>
-                <span className="text-white">)</span> selected projects
+          {showContext ? (
+            <div className="space-y-6 bg-gray-900/50 backdrop-blur-md rounded-xl p-6">
+              <div>
+                <p className="text-gray-300">
+                  I'm currently working at <span className="text-blue-400 hover:underline cursor-pointer">Wix</span>, specifically in the Analytics product.
+                  We're helping people make informed decisions about their website.
+                </p>
               </div>
-              
-              {/* Projects Container with Animation */}
-              <div className={`projects-container ${projectsVisible ? 'visible' : ''}`}>
-                {!constellationMode ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 project-grid">
-                    {projects.map(project => (
-                      <div 
-                        key={project.id}
-                        id={`project-${project.id}`}
-                        className={`project-card bg-gray-900 bg-opacity-60 p-5 rounded-lg transition-all ${
-                          selectedProject === project.id ? 'selected' : ''
-                        } ${
-                          hoveredCard !== null && hoveredCard !== project.id ? 'project-card-dimmed' : ''
-                        }`}
-                        onMouseEnter={() => setHoveredCard(project.id)}
-                        onMouseLeave={() => setHoveredCard(null)}
-                        onClick={() => handleProjectClick(project.id)}
-                      >
-                        <div className="flex items-start">
-                          <div 
-                            className="w-10 h-10 rounded-md flex items-center justify-center text-white mr-3 flex-shrink-0"
-                            style={{ backgroundColor: project.iconBg }}
-                          >
-                            {project.icon}
-                          </div>
-                          <div>
-                            <h3 className="text-white font-medium">{project.name}</h3>
-                            <p className="text-gray-300 text-sm mt-1">{project.description}</p>
-                            <div className="mt-3">
-                              <span className="inline-block bg-gray-800 text-xs text-blue-300 px-2 py-1 rounded font-mono border border-gray-700">
-                                <span className="mr-1">🔭</span>{project.type}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="constellation-container">
-                    {/* Exit constellation mode button */}
-                    <button 
-                      className="exit-constellation bg-gray-800 bg-opacity-70 text-white px-4 py-2 rounded-lg shadow-lg flex items-center backdrop-filter backdrop-blur-sm"
-                      onClick={() => {
-                        setConstellationMode(false);
-                        setSelectedProject(null);
-                      }}
-                    >
-                      <span className="mr-2">✖️</span> Exit View
-                    </button>
-                    
-                    {/* Constellation Canvas for Drawing Lines */}
-                    <canvas ref={constellationRef} className="constellation-canvas" />
-                    
-                    {/* Selected Project Card */}
-                    {selectedProject !== null && (
-                      <div
-                        id={`project-${selectedProject}`}
-                        className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-gray-900 bg-opacity-70 p-6 rounded-lg shadow-xl z-10 text-white project-card selected"
-                        style={{ width: '300px', textAlign: 'center' }}
-                      >
-                        <div
-                          className="w-12 h-12 mx-auto mb-3 rounded-md flex items-center justify-center"
-                          style={{ backgroundColor: projects.find(p => p.id === selectedProject)?.iconBg }}
-                        >
-                          {projects.find(p => p.id === selectedProject)?.icon}
-                        </div>
-                        <h3 className="text-xl font-semibold">
-                          {projects.find(p => p.id === selectedProject)?.name}
-                        </h3>
-                        <p className="text-sm text-gray-300 mt-2">
-                          {projects.find(p => p.id === selectedProject)?.description}
-                        </p>
-                      </div>
-                    )}
 
-                    {/* Feature Nodes (Constellation Points) */}
-                    {projectFeatures.map((feature, index) => (
-                      <div
-                        key={feature.id}
-                        className="constellation-point bg-gray-800 p-3 rounded-lg text-white text-sm text-center pulse"
-                        style={{
-                          left: `${feature.constellationX}%`,
-                          top: `${feature.constellationY}%`,
-                          width: '140px',
-                          transform: 'translate(-50%, -50%)',
-                        }}
-                        onMouseEnter={() => setHoveredFeature(feature.id)}
-                        onMouseLeave={() => setHoveredFeature(null)}
-                      >
-                        <div className="text-xl mb-1">{feature.icon}</div>
-                        <div className="font-semibold">{feature.name}</div>
-                        {hoveredFeature === feature.id && (
-                          <div className="text-xs mt-1 text-gray-400">
-                            {feature.description}
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                )}
+              <div>
+                <p className="text-gray-300">
+                  Also, I'm the founding designer at <span className="text-blue-400 hover:underline cursor-pointer">Zorir</span> – an app to find professionals
+                  by recommendations.
+                </p>
+              </div>
+
+              <div>
+                <p className="text-gray-300">
+                  Before Wix I designed <span className="text-blue-400 hover:underline cursor-pointer">OLX</span> – the most popular classifieds in Ukraine
+                  with over 15M MAU. I worked on "OLX Delivery," which is the part of
+                  the product where buyers make purchases and sellers approve them.
+                </p>
+              </div>
+
+              <div>
+                <p className="text-gray-300">
+                  Before OLX I worked at <span className="text-blue-400 hover:underline cursor-pointer">ELEKS</span> – one of the biggest outsourcing
+                  companies in Ukraine.
+                </p>
+              </div>
+
+              <div>
+                <p className="text-gray-300">
+                  While working in ELEKS I briefly joined <span className="text-blue-400 hover:underline cursor-pointer">Finesweet</span> – a famous
+                  Webflow agency, where I designed a few projects.
+                </p>
+              </div>
+
+              <div>
+                <p className="text-gray-300">
+                  Before that I worked in <span className="text-blue-400 hover:underline cursor-pointer">dops.digital</span> – a design studio. This was my
+                  first full-time job.
+                </p>
+              </div>
+
+              <div>
+                <p className="text-gray-300">
+                  Before joining dops.digital I freelanced for multiple years, mainly
+                  designing websites and simple interfaces.
+                </p>
               </div>
             </div>
+          ) : (
+            <div className="bg-gray-900/50 backdrop-blur-md rounded-xl p-6">
+              {workHistory.map((job, index) => (
+                <div key={index} className="flex justify-between py-3 border-b border-gray-800 last:border-0">
+                  <div className="text-white">{job.company}</div>
+                  <div className="text-blue-400">{job.period}</div>
+                </div>
+              ))}
+            </div>
+          )}
 
-            {/* Changelog Section */}
-            <div className="mt-16">
-              <div className="text-gray-400 mb-2 font-mono flex items-center">
-                <span className="mr-2">📜</span>
-                <span className="text-blue-400">const</span> changelog = []
+          <div className="mt-6">
+            <button className="border border-green-500 text-green-500 hover:bg-green-900/20 rounded-full px-6 py-3 flex items-center gap-2">
+              <span className="w-3 h-3 bg-green-500 rounded-full"></span>
+              Available for projects
+            </button>
+          </div>
+        </section>
+
+        {/* Recognition Section */}
+        <section className="max-w-6xl mx-auto p-4 md:p-8 mt-8">
+          <h2 className="text-2xl font-bold mb-6">Recognition 🏆</h2>
+          <div className="space-y-6 bg-gray-900/50 backdrop-blur-md rounded-xl p-6">
+            <div className="flex flex-col md:flex-row justify-between md:items-center">
+              <div className="text-gray-400 mb-2 md:mb-0">awwwards.</div>
+              <div className="text-left md:text-right">Young Jury (2020–now), x2 Honorable Mention</div>
+            </div>
+            
+            <div className="flex flex-col md:flex-row justify-between md:items-center">
+              <div className="flex items-center gap-2 mb-2 md:mb-0">
+                <div className="w-8 h-8 bg-gray-800 rounded-full flex items-center justify-center">P</div>
+                <span className="text-gray-400">Product Hunt</span>
               </div>
-              <ul className="space-y-4">
-                {changelog.map((entry, index) => (
-                  <li key={index} className="text-gray-300">
-                    <span className="text-gray-500 font-mono text-sm mr-2">// {entry.date}</span>
-                    <span>{entry.content}</span>
-                    {entry.link && (
-                      <span className="ml-1 text-indigo-400 hover:underline cursor-pointer">
-                        {entry.link}
-                      </span>
-                    )}
-                  </li>
-                ))}
+              <div className="text-left md:text-right">x3 Product of the Day</div>
+            </div>
+            
+            <div className="flex flex-col md:flex-row justify-between md:items-center">
+              <div className="text-gray-400 mb-2 md:mb-0">Figma</div>
+              <div className="text-left md:text-right">Plugins featured, grant recipient</div>
+            </div>
+            
+            <div className="flex flex-col md:flex-row justify-between md:items-center">
+              <div className="flex items-center gap-2 mb-2 md:mb-0">
+                <span className="text-gray-400">Webflow</span>
+              </div>
+              <div className="text-left md:text-right">Webflow Awards 2022 Finalist for companies.tools</div>
+            </div>
+            
+            <div className="flex flex-col md:flex-row justify-between md:items-center">
+              <div className="text-gray-400 mb-2 md:mb-0">CSSDesignAwards</div>
+              <div className="text-left md:text-right">Special Kudos for thepentool.co</div>
+            </div>
+            
+            <div className="flex flex-col md:flex-row justify-between md:items-center">
+              <div className="text-gray-400 mb-2 md:mb-0">Bēhance</div>
+              <div className="text-left md:text-right">x10 Behance Galleries</div>
+            </div>
+            
+            <div className="flex flex-col md:flex-row justify-between md:items-center">
+              <div className="flex items-center gap-2 mb-2 md:mb-0">
+                <span className="text-gray-400">Framer</span>
+              </div>
+              <div className="text-left md:text-right">Featured on Framer Showcase for 2022 CT Recap</div>
+            </div>
+            
+            <div className="flex flex-col md:flex-row justify-between md:items-center">
+              <div className="flex items-center gap-2 mb-2 md:mb-0">
+                <span className="text-gray-400">Awards</span>
+              </div>
+              <div className="text-left md:text-right">"The Very Best Example of Website Design"</div>
+            </div>
+          </div>
+        </section>
+
+        {/* Interests Section */}
+        <section className="max-w-6xl mx-auto p-4 md:p-8 mt-8">
+          <h2 className="text-2xl font-bold mb-6">Cosmic Interests 🌌</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="bg-gray-900/50 backdrop-blur-md rounded-xl p-6">
+              <h3 className="text-xl font-semibold mb-4 flex items-center">
+                <span className="mr-2">🚀</span>
+                Space Exploration Technologies
+              </h3>
+              <ul className="space-y-2">
+                <li className="flex items-center">
+                  <span className="text-blue-400 mr-2">›</span>
+                  Spacecraft propulsion systems
+                </li>
+                <li className="flex items-center">
+                  <span className="text-blue-400 mr-2">›</span>
+                  Orbital mechanics simulations
+                </li>
+                <li className="flex items-center">
+                  <span className="text-blue-400 mr-2">›</span>
+                  Deep space communication networks
+                </li>
+                <li className="flex items-center">
+                  <span className="text-blue-400 mr-2">›</span>
+                  Habitation modules for extended missions
+                </li>
+              </ul>
+            </div>
+            
+            <div className="bg-gray-900/50 backdrop-blur-md rounded-xl p-6">
+              <h3 className="text-xl font-semibold mb-4 flex items-center">
+                <span className="mr-2">🔭</span>
+                Astrophysics & Astronomy
+              </h3>
+              <ul className="space-y-2">
+                <li className="flex items-center">
+                  <span className="text-blue-400 mr-2">›</span>
+                  Black hole event horizons
+                </li>
+                <li className="flex items-center">
+                  <span className="text-blue-400 mr-2">›</span>
+                  Exoplanet discovery techniques
+                </li>
+                <li className="flex items-center">
+                  <span className="text-blue-400 mr-2">›</span>
+                  Relativistic effects at galactic scales
+                </li>
+                <li className="flex items-center">
+                  <span className="text-blue-400 mr-2">›</span>
+                  Stellar evolution patterns
+                </li>
               </ul>
             </div>
           </div>
-
-          {/* Right column (sidebar) */}
-          <div className="lg:w-72 space-y-6">
-            {/* Navigation Menu (only shown at larger screens) */}
-            <div className="hidden lg:block mb-6">
-              <div className="text-gray-400 mb-2 font-mono flex items-center">
-                <span className="mr-2">🧭</span>
-                <span className="text-blue-400">function</span> navigate<span className="text-white">()</span>
-              </div>
-              
-              <div className="bg-gray-900 bg-opacity-70 rounded-lg overflow-hidden backdrop-filter backdrop-blur-sm">
-                {['Work', 'About', 'Lab'].map(tab => (
-                  <button
-                    key={tab}
-                    className={`block w-full text-left px-4 py-3 ${
-                      selectedTab === tab ? 'bg-indigo-900 bg-opacity-40 text-white' : 'text-gray-300 hover:bg-gray-800'
-                    } transition-colors flex items-center`}
-                    onClick={() => setSelectedTab(tab)}
-                  >
-                    {tab === 'Work' && <span className="mr-2">🚀</span>}
-                    {tab === 'About' && <span className="mr-2">👨‍🚀</span>}
-                    {tab === 'Lab' && <span className="mr-2">🧪</span>}
-                    {tab}
-                  </button>
-                ))}
-              </div>
-            </div>
-            
-            {/* Status indicator */}
-            <div>
-              <div className="text-gray-400 mb-2 font-mono flex items-center">
-                <span className="mr-2">📊</span>
-                <span className="text-blue-400">const</span> status
-              </div>
-              
-              <div className="bg-gray-900 bg-opacity-70 p-4 rounded-lg backdrop-filter backdrop-blur-sm">
-                <div className="flex items-center mb-3">
-                  <div className="flex-shrink-0 w-3 h-3 rounded-full bg-green-400 mr-2 animate-pulse"></div>
-                  <div className="text-gray-300">Available for hire</div>
-                </div>
-                <div className="flex items-center mb-3">
-                  <div className="flex-shrink-0 w-3 h-3 rounded-full bg-yellow-400 mr-2"></div>
-                  <div className="text-gray-300">Working on startup</div>
-                </div>
-                <div className="flex items-center">
-                  <div className="flex-shrink-0 w-3 h-3 rounded-full bg-blue-400 mr-2 animate-pulse"></div>
-                  <div className="text-gray-300">Learning Dutch</div>
-                </div>
-              </div>
-            </div>
-            
-            {/* Quick links */}
-            <div>
-              <div className="text-gray-400 mb-2 font-mono flex items-center">
-                <span className="mr-2">🔗</span>
-                <span className="text-blue-400">Array</span><span className="text-white">(4)</span> links
-              </div>
-              
-              <div className="bg-gray-900 bg-opacity-70 rounded-lg overflow-hidden backdrop-filter backdrop-blur-sm">
-                <a href="#" className="block px-4 py-3 text-gray-300 hover:bg-gray-800 transition-colors">LinkedIn</a>
-                <a href="#" className="block px-4 py-3 text-gray-300 hover:bg-gray-800 transition-colors">GitHub</a>
-                <a href="#" className="block px-4 py-3 text-gray-300 hover:bg-gray-800 transition-colors">Twitter</a>
-                <a href="#" className="block px-4 py-3 text-gray-300 hover:bg-gray-800 transition-colors">Resume</a>
-              </div>
-            </div>
-            
-            {/* Technical skills */}
-            <div>
-              <div className="text-gray-400 mb-2 font-mono flex items-center">
-                <span className="mr-2">🛠️</span>
-                <span className="text-blue-400">Object</span> tech_stack
-              </div>
-              
-              <div className="bg-gray-900 bg-opacity-70 p-4 rounded-lg backdrop-filter backdrop-blur-sm">
-                <div className="mb-3">
-                  <div className="text-white mb-1">Languages</div>
-                  <div className="flex flex-wrap gap-2">
-                    <span className="px-2 py-1 bg-gray-800 text-xs rounded text-blue-300 border border-gray-700">JavaScript</span>
-                    <span className="px-2 py-1 bg-gray-800 text-xs rounded text-blue-300 border border-gray-700">TypeScript</span>
-                    <span className="px-2 py-1 bg-gray-800 text-xs rounded text-blue-300 border border-gray-700">Python</span>
-                    <span className="px-2 py-1 bg-gray-800 text-xs rounded text-blue-300 border border-gray-700">Java</span>
-                  </div>
-                </div>
-                
-                <div className="mb-3">
-                  <div className="text-white mb-1">Frameworks</div>
-                  <div className="flex flex-wrap gap-2">
-                    <span className="px-2 py-1 bg-gray-800 text-xs rounded text-blue-300 border border-gray-700">React</span>
-                    <span className="px-2 py-1 bg-gray-800 text-xs rounded text-blue-300 border border-gray-700">Next.js</span>
-                    <span className="px-2 py-1 bg-gray-800 text-xs rounded text-blue-300 border border-gray-700">Node.js</span>
-                    <span className="px-2 py-1 bg-gray-800 text-xs rounded text-blue-300 border border-gray-700">Express</span>
-                  </div>
-                </div>
-                
-                <div>
-                  <div className="text-white mb-1">Tools</div>
-                  <div className="flex flex-wrap gap-2">
-                    <span className="px-2 py-1 bg-gray-800 text-xs rounded text-blue-300 border border-gray-700">Figma</span>
-                    <span className="px-2 py-1 bg-gray-800 text-xs rounded text-blue-300 border border-gray-700">VS Code</span>
-                    <span className="px-2 py-1 bg-gray-800 text-xs rounded text-blue-300 border border-gray-700">Git</span>
-                    <span className="px-2 py-1 bg-gray-800 text-xs rounded text-blue-300 border border-gray-700">AWS</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            {/* Music player */}
-            <div>
-              <div className="text-gray-400 mb-2 font-mono flex items-center">
-                <span className="mr-2">🎵</span>
-                <span className="text-blue-400">function</span> nowPlaying<span className="text-white">()</span>
-              </div>
-              
-              <div className="bg-gray-900 bg-opacity-70 p-4 rounded-lg backdrop-filter backdrop-blur-sm">
-                <div className="flex items-center">
-                  <div className="w-12 h-12 bg-gray-800 rounded-md mr-3 flex-shrink-0 overflow-hidden">
-                    <div className="w-full h-full bg-gradient-to-br from-indigo-600 to-purple-700 flex items-center justify-center text-xl">
-                      🎧
-                    </div>
-                  </div>
-                  <div>
-                    <div className="text-white text-sm font-medium">Starship Operators</div>
-                    <div className="text-gray-400 text-xs">Cosmic Funk</div>
-                  </div>
-                </div>
-                <div className="mt-3">
-                  <div className="w-full bg-gray-800 h-1 rounded-full">
-                    <div className="bg-indigo-500 h-1 rounded-full" style={{width: '65%'}}></div>
-                  </div>
-                  <div className="flex justify-between text-xs text-gray-400 mt-1">
-                    <span>2:15</span>
-                    <span>3:30</span>
-                  </div>
-                </div>
-                <div className="flex justify-center space-x-4 mt-3">
-                  <button className="text-gray-300 hover:text-white transition-colors">⏮️</button>
-                  <button className="text-white bg-indigo-600 rounded-full w-8 h-8 flex items-center justify-center hover:bg-indigo-500 transition-colors">▶️</button>
-                  <button className="text-gray-300 hover:text-white transition-colors">⏭️</button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        </section>
       </div>
-      
-      {/* Footer */}
-      <footer className="max-w-7xl mx-auto px-4 py-8 mt-10 border-t border-gray-800">
-        <div className="flex flex-col md:flex-row justify-between items-center">
-          <div className="mb-4 md:mb-0">
-            <p className="text-gray-400">© {new Date().getFullYear()} Krish Singh</p>
-            <p className="text-gray-500 text-sm">Made with 💻 and ☕</p>
-          </div>
-          <div className="text-center md:text-right">
-            <p className="text-gray-400 flex items-center justify-center md:justify-end">
-              <span className="mr-2">🌌</span> Exploring space & code since 2015
-            </p>
-            <div className="flex space-x-4 mt-2 justify-center md:justify-end">
-              <a href="#" className="text-gray-400 hover:text-white transition-colors">LinkedIn</a>
-              <a href="#" className="text-gray-400 hover:text-white transition-colors">GitHub</a>
-              <a href="#" className="text-gray-400 hover:text-white transition-colors">Twitter</a>
+
+      {/* Space Theme Background Effect */}
+      <div className="fixed top-0 left-0 w-full h-full -z-10">
+        <div className="absolute top-0 left-0 w-full h-full bg-black"></div>
+        
+        {/* Stars */}
+        {Array.from({ length: 150 }).map((_, i) => (
+          <motion.div
+            key={`star-${i}`}
+            className="absolute bg-white rounded-full"
+            initial={{ opacity: Math.random() * 0.7 + 0.3 }}
+            animate={{ 
+              opacity: [Math.random() * 0.7 + 0.3, Math.random() * 0.5 + 0.5, Math.random() * 0.7 + 0.3],
+            }}
+            transition={{ 
+              duration: Math.random() * 5 + 3,
+              repeat: Infinity,
+              repeatType: "reverse"
+            }}
+            style={{
+              top: `${Math.random() * 100}%`,
+              left: `${Math.random() * 100}%`,
+              width: `${Math.random() * 3 + 1}px`,
+              height: `${Math.random() * 3 + 1}px`,
+            }}
+          />
+        ))}
+
+        {/* Constellations */}
+        <svg className="absolute top-0 left-0 w-full h-full" style={{ opacity: 0.5 }}>
+          {/* Big Dipper */}
+          <g className="constellation">
+            <circle cx="10%" cy="15%" r="2" fill="white" />
+            <circle cx="15%" cy="18%" r="2" fill="white" />
+            <circle cx="20%" cy="20%" r="2" fill="white" />
+            <circle cx="25%" cy="22%" r="2" fill="white" />
+            <circle cx="30%" cy="18%" r="2" fill="white" />
+            <circle cx="35%" cy="16%" r="2" fill="white" />
+            <circle cx="40%" cy="13%" r="2" fill="white" />
+            <line x1="10%" y1="15%" x2="15%" y2="18%" stroke="rgba(255,255,255,0.3)" strokeWidth="1" />
+            <line x1="15%" y1="18%" x2="20%" y2="20%" stroke="rgba(255,255,255,0.3)" strokeWidth="1" />
+            <line x1="20%" y1="20%" x2="25%" y2="22%" stroke="rgba(255,255,255,0.3)" strokeWidth="1" />
+            <line x1="25%" y1="22%" x2="30%" y2="18%" stroke="rgba(255,255,255,0.3)" strokeWidth="1" />
+            <line x1="30%" y1="18%" x2="35%" y2="16%" stroke="rgba(255,255,255,0.3)" strokeWidth="1" />
+            <line x1="35%" y1="16%" x2="40%" y2="13%" stroke="rgba(255,255,255,0.3)" strokeWidth="1" />
+          </g>
+          
+          {/* Orion */}
+          <g className="constellation">
+            <circle cx="70%" cy="65%" r="2" fill="white" />
+            <circle cx="73%" cy="60%" r="2" fill="white" />
+            <circle cx="75%" cy="70%" r="2" fill="white" />
+            <circle cx="78%" cy="65%" r="3" fill="#4F9CF9" /> {/* Blue star */}
+            <circle cx="80%" cy="75%" r="2" fill="white" />
+            <circle cx="83%" cy="60%" r="2" fill="white" />
+            <circle cx="85%" cy="70%" r="2" fill="white" />
+            <line x1="70%" y1="65%" x2="73%" y2="60%" stroke="rgba(255,255,255,0.3)" strokeWidth="1" />
+            <line x1="73%" y1="60%" x2="78%" y2="65%" stroke="rgba(255,255,255,0.3)" strokeWidth="1" />
+            <line x1="78%" y1="65%" x2="83%" y2="60%" stroke="rgba(255,255,255,0.3)" strokeWidth="1" />
+            <line x1="75%" y1="70%" x2="78%" y2="65%" stroke="rgba(255,255,255,0.3)" strokeWidth="1" />
+            <line x1="78%" y1="65%" x2="80%" y2="75%" stroke="rgba(255,255,255,0.3)" strokeWidth="1" />
+            <line x1="80%" y1="75%" x2="85%" y2="70%" stroke="rgba(255,255,255,0.3)" strokeWidth="1" />
+          </g>
+        </svg>
+
+        {/* Animated Rocket */}
+        <motion.div
+          className="absolute"
+          initial={{ top: "110%", left: "10%" }}
+          animate={{ top: "-10%", left: "30%" }}
+          transition={{ 
+            duration: 15,
+            repeat: Infinity,
+            repeatDelay: 20
+          }}
+          style={{ zIndex: 5 }}
+        >
+          <div className="relative">
+            <div className="absolute w-2 h-8 bg-orange-500 rounded-full blur-md -bottom-8 left-1/2 transform -translate-x-1/2"></div>
+            <div className="w-4 h-10 bg-gray-300 rounded-t-full relative">
+              <div className="absolute bottom-0 left-0 w-4 h-2 bg-red-500"></div>
+              <div className="absolute -left-2 bottom-2 w-2 h-3 bg-gray-400 -skew-y-12"></div>
+              <div className="absolute -right-2 bottom-2 w-2 h-3 bg-gray-400 skew-y-12"></div>
             </div>
           </div>
-        </div>
-      </footer>
+        </motion.div>
+
+        {/* Orbiting Planet */}
+        <motion.div
+          className="absolute w-12 h-12 rounded-full"
+          style={{
+            background: "radial-gradient(circle, #2C5282 0%, #1A365D 100%)",
+            boxShadow: "0 0 15px rgba(66, 153, 225, 0.5)"
+          }}
+          initial={{ top: "50%", left: "85%" }}
+          animate={{
+            top: ["50%", "55%", "50%", "45%", "50%"],
+            left: ["85%", "86%", "87%", "86%", "85%"],
+          }}
+          transition={{ 
+            duration: 30,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+        >
+          <div className="absolute top-1 left-3 w-2 h-2 rounded-full bg-blue-300 opacity-70"></div>
+          <div className="absolute top-3 left-7 w-3 h-3 rounded-full bg-blue-200 opacity-60"></div>
+          <motion.div
+            className="absolute w-2 h-2 rounded-full bg-gray-200"
+            initial={{ top: 0, left: 0, rotate: 0 }}
+            animate={{ rotate: 360 }}
+            transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+            style={{ 
+              transformOrigin: "6px 6px",
+              top: -3, 
+              left: 5
+            }}
+          />
+        </motion.div>
+
+        {/* Shooting Stars */}
+        <motion.div
+          className="absolute h-px w-20 bg-white"
+          initial={{ top: "-5%", left: "110%", rotate: -45 }}
+          animate={{ top: "30%", left: "70%" }}
+          transition={{ 
+            duration: 2,
+            repeat: Infinity,
+            repeatDelay: 7
+          }}
+          style={{ boxShadow: "0 0 20px 2px white" }}
+        />
+        
+        <motion.div
+          className="absolute h-px w-12 bg-white"
+          initial={{ top: "-5%", left: "40%", rotate: -45 }}
+          animate={{ top: "15%", left: "20%" }}
+          transition={{ 
+            duration: 1.5,
+            repeat: Infinity,
+            repeatDelay: 12
+          }}
+          style={{ boxShadow: "0 0 20px 2px white" }}
+        />
+      </div>
+
+      {/* Fixed UI Elements - Rearranged for better spacing */}
+      {/* Navigation - Bottom center */}
+      <motion.div 
+        className="fixed bottom-8 left-1/2 transform -translate-x-1/2 flex space-x-2 z-50"
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+      >
+        <Link href="/" className="bg-gray-800/80 hover:bg-gray-700 w-16 h-16 rounded-lg flex flex-col items-center justify-center text-xs backdrop-blur-md">
+          <span className="mb-1">🚀</span>
+          Home
+        </Link>
+        <Link href="/about" className="bg-gray-700/80 hover:bg-gray-600 w-16 h-16 rounded-lg flex flex-col items-center justify-center text-xs backdrop-blur-md">
+          <span className="mb-1">👨‍💻</span>
+          About
+        </Link>
+        <Link href="/demo" className="bg-gray-800/80 hover:bg-gray-700 w-16 h-16 rounded-lg flex flex-col items-center justify-center text-xs backdrop-blur-md">
+          <span className="mb-1">🧪</span>
+          Demos
+        </Link>
+      </motion.div>
+
+
+
+
+      
+
+      {/* Neptune Visualization - Bottom right corner */}
+      <motion.div
+        className="fixed bottom-1/2 right-16 w-24 h-24 rounded-full"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 0.6 }}
+        transition={{ delay: 1, duration: 2 }}
+        style={{
+          background: "radial-gradient(circle, #2B6CB0 0%, #1A365D 70%, #0F172A 100%)",
+          boxShadow: "0 0 20px rgba(43, 108, 176, 0.5)",
+          filter: "blur(1px)"
+        }}
+      >
+        <motion.div
+          className="absolute inset-0 rounded-full"
+          style={{
+            background: "linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.1) 50%, transparent 100%)",
+          }}
+          animate={{ rotate: 360 }}
+          transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
+        />
+      </motion.div>
     </div>
   );
 }

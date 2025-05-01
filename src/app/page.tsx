@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, JSX } from 'react';
-
+import Link from 'next/link';
 // Type definitions
 interface Project {
   id: number;
@@ -790,50 +790,68 @@ export default function Page(): JSX.Element {
 
           {/* Right column (sidebar) */}
           <div className="lg:w-72 space-y-6">
-            {/* Navigation Menu (only shown at larger screens) */}
-            <div className="hidden lg:block mb-6">
-              <div className="text-gray-400 mb-2 font-mono flex items-center">
-                <span className="mr-2">🧭</span>
-                <span className="text-blue-400">function</span> navigate<span className="text-white">()</span>
-              </div>
-              
-              <div className="bg-gray-900 bg-opacity-70 rounded-lg overflow-hidden backdrop-filter backdrop-blur-sm">
-                {['Work', 'About', 'Lab'].map(tab => (
-                  <button
-                    key={tab}
-                    className={`block w-full text-left px-4 py-3 ${
-                      selectedTab === tab ? 'bg-indigo-900 bg-opacity-40 text-white' : 'text-gray-300 hover:bg-gray-800'
-                    } transition-colors flex items-center`}
-                    onClick={() => setSelectedTab(tab)}
-                  >
-                    {tab === 'Work' && <span className="mr-2">🚀</span>}
-                    {tab === 'About' && <span className="mr-2">👨‍🚀</span>}
-                    {tab === 'Lab' && <span className="mr-2">🧪</span>}
-                    {tab}
-                  </button>
-                ))}
-              </div>
-            </div>
-            
-            {/* Status indicator */}
-            <div>
-              <div className="text-gray-400 mb-2 font-mono flex items-center">
-                <span className="mr-2">📊</span>
-                <span className="text-blue-400">const</span> status
-              </div>
-              
-              <div className="bg-gray-900 bg-opacity-70 p-4 rounded-lg backdrop-filter backdrop-blur-sm">
-                <div className="flex items-center mb-3">
-                  <div className="flex-shrink-0 w-3 h-3 rounded-full bg-green-400 mr-2 animate-pulse"></div>
-                  <div className="text-gray-300">Available for hire</div>
+          <div className="lg:w-72 space-y-6 mt-10 lg:mt-0"> {/* Added top margin for mobile */}
+             {/* Navigation Menu (only shown at larger screens) */}
+              <div className="hidden lg:block mb-6">
+                <div className="text-gray-400 mb-2 font-mono flex items-center">
+                  <span className="mr-2">🧭</span>
+                  <span className="text-blue-400">function</span> navigate<span className="text-white">()</span>
                 </div>
-                <div className="flex items-center mb-3">
-                  <div className="flex-shrink-0 w-3 h-3 rounded-full bg-yellow-400 mr-2"></div>
-                  <div className="text-gray-300">Working on startup</div>
-                </div>
-                <div className="flex items-center">
-                  <div className="flex-shrink-0 w-3 h-3 rounded-full bg-blue-400 mr-2 animate-pulse"></div>
-                  <div className="text-gray-300">Learning Dutch</div>
+                
+                <div className="bg-gray-900 bg-opacity-70 rounded-lg overflow-hidden backdrop-filter backdrop-blur-sm">
+                  {['Work', 'About', 'Lab'].map(tab => {
+                    const isSelected = selectedTab === tab;
+                    const commonClasses = `block w-full text-left px-4 py-3 transition-colors flex items-center ${
+                      isSelected ? 'bg-indigo-900 bg-opacity-40 text-white' : 'text-gray-300 hover:bg-gray-800'
+                    }`;
+
+                    let icon = '';
+                    if (tab === 'Work') icon = '🚀';
+                    if (tab === 'About') icon = '👨‍🚀';
+                    if (tab === 'Lab') icon = '🧪';
+                    
+                    // Link 'About' to /about and 'Lab' to /demo
+                    // 'Work' remains a button to set local state
+                    if (tab === 'About') {
+                      return (
+                        <Link key={tab} href="/about" passHref>
+                          <button 
+                             className={commonClasses}
+                             // Keep onClick to update visual state if desired, 
+                             // though it might reset on navigation depending on layout persistence.
+                             onClick={() => setSelectedTab(tab)} 
+                          >
+                            <span className="mr-2">{icon}</span>
+                            {tab}
+                          </button>
+                        </Link>
+                      );
+                    } else if (tab === 'Lab') {
+                       // NOTE: Linking "Lab" button to "/demo" as requested.
+                      return (
+                        <Link key={tab} href="/demo" passHref>
+                           <button 
+                             className={commonClasses}
+                             onClick={() => setSelectedTab(tab)}
+                           >
+                             <span className="mr-2">{icon}</span>
+                             {tab}
+                           </button>
+                        </Link>
+                      );
+                    } else { // 'Work' tab
+                      return (
+                        <button
+                          key={tab}
+                          className={commonClasses}
+                          onClick={() => setSelectedTab(tab)}
+                        >
+                          <span className="mr-2">{icon}</span>
+                          {tab}
+                        </button>
+                      );
+                    }
+                  })}
                 </div>
               </div>
             </div>
