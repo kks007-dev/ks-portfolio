@@ -642,15 +642,13 @@ export default function Page(): JSX.Element {
                   </div>
                 ))}
               </div>
-              <span className="text-xs text-gray-500 ml-2 font-mono">// visitor_id</span>
-            </div>
+              <span className="text-xs text-gray-500 ml-2 font-mono">{`// visitor_id`}</span>            </div>
 
             {/* Ukraine support notice */}
             <div className="bg-gray-900 bg-opacity-70 p-3 rounded-lg mb-6 backdrop-filter backdrop-blur-sm">
               <p className="text-white flex items-center font-mono">
                 <span className="mr-2">🇺🇦</span>
-                <span><span className="text-indigo-400">console.log(</span>"newest development: stars portal v2.2!"<span className="text-indigo-400">);</span></span>
-              </p>
+                <span><span className="text-indigo-400">console.log(&quot;newest development: stars portal v2.2!&quot;);</span></span>              </p>
             </div>
 
             {/* Selected projects section */}
