@@ -53,12 +53,31 @@ export default function About() {
 
   // Work history data
   const workHistory = [
-    { company: "Wix", period: "Aug 2023 — Now" },
-    { company: "Zori", period: "Nov 2020 — Now" },
-    { company: "OLX Ukraine (via Rebbix)", period: "Nov 2021 — Jun 2023" },
-    { company: "ELEKS", period: "Jul 2017 — Oct 2021" },
-    { company: "Finsweet", period: "May 2020 — Oct 2020" },
-    { company: "dops.digital", period: "Jan 2017 — Jul 2017" },
+    { company: "STARS Non-Profit", period: "2022 — Now" },
+    { company: "Robo-Colts FRC #9478", period: "2023 — Now" },
+    { company: "FIRST Tech Challenge", period: "2017 — Now" },
+    { company: "RICE University PATHS_UP", period: "Summer 2024" },
+    { company: "University of Houston I-TECH", period: "Summer 2023 — 2024" },
+    { company: "VentureStarters", period: "2024 — Now" },
+  ];
+
+  // Education data
+  const education = {
+    school: "Harmony School of Innovation, Sugar Land, TX",
+    period: "Aug. 2021 - May 2025",
+    rank: "Class Rank: 20/201",
+    gpa: "GPA: 4.53/4.0 (Weighted), 3.84/4.0 (Unweighted)",
+    act: "ACT Superscore: 33 (M:34, S:32, E:34, R:31)"
+  };
+
+  // Projects data
+  const projects = [
+    "S.T.A.R.S Portal | Full Stack Development; Node.JS, React, TypeScript",
+    "I.D.R.O.N Solar Powered Household Radiation Detector",
+    "TSA Carbon Pollution Energy App | Predictive Carbon Footprint",
+    "Microcontroller Vitamin D Health Device | RICE University Research",
+    "Diligence Financial Platform (Beta) | Financial Indicators and Data",
+    "Un-Leach | Leachate Contamination Research Project"
   ];
 
   return (
@@ -79,13 +98,13 @@ export default function About() {
             <div>
               <h1 className="text-5xl font-bold text-white">Krish Singh</h1>
               <div className="mt-1">
-                <p className="text-gray-300">Software Engineer</p>
-                <p className="text-gray-400 text-sm">Currently at STARS »</p>
+                <p className="text-gray-300">Robotics Engineer & Full Stack Developer</p>
+                <p className="text-gray-400 text-sm">Founder at STARS Non-Profit »</p>
               </div>
             </div>
             <div className="mt-4 md:mt-0 text-right">
               <p className="text-gray-300">Researching, prototyping, designing and testing <span className="text-gray-400">by day</span></p>
-              <p className="text-gray-300">coding, no-coding, launching products <span className="text-gray-400">by night</span></p>
+              <p className="text-gray-300">coding, competing, leading teams <span className="text-gray-400">by night</span></p>
               <div className="text-left md:text-right mt-4 md:mt-0">
              
               {showEmail ? (
@@ -112,24 +131,29 @@ export default function About() {
 
       {/* Main Content */}
       <div className="relative z-20 pb-32"> {/* Added bottom padding to prevent overlap with fixed elements */}
-        {/* Header */}
         
-        <header className="max-w-6xl mx-auto p-4 pt-8 md:p-8">
-          <div className="flex flex-col items-start">
-         
-          </div>
-          
-          <div className="mt-8 flex flex-col md:flex-row justify-between items-start md:items-center">
-            <div>
+        {/* Education Section */}
+        <section className="max-w-6xl mx-auto p-4 md:p-8 mt-8">
+          <h2 className="text-2xl font-bold mb-6">Education 🎓</h2>
+          <div className="bg-gray-900/50 backdrop-blur-md rounded-xl p-6">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4">
+              <h3 className="text-xl font-semibold">{education.school}</h3>
+              <div className="text-blue-400">{education.period}</div>
             </div>
-            
+            <div className="space-y-2 text-gray-300">
+              <p>{education.rank}</p>
+              <p>{education.gpa}</p>
+              <p>{education.act}</p>
+              <p className="text-gray-400 mt-4">STEM Coursework: PLTW Intro to Engineering Design, Principles of Applied Engineering, AP Computer Science Principles, AP Calculus AB, AP Calculus BC, AP Physics 1, AP Physics C Mechanics, AP Chemistry, PLTW Aerospace Engineering, PLTW Engineering Design and Development</p>
+            </div>
           </div>
-        </header>
+        </section>
 
         {/* Work Experience Section */}
-        <section className="max-w-6xl mx-auto p-4 md:p-8 mt-8">
-          <div className="flex flex-col md:flex-row md:items-center gap-2 mb-6">
-          <h2 className="text-2xl font-bold">Where I&apos;ve worked</h2>            <div className="flex space-x-2 mt-2 md:mt-0 md:ml-4">
+        <section className="max-w-6xl mx-auto p-4 md:p-8">
+          <div className="flex flex-col md:flex-row md:items-center">
+            <h2 className="text-2xl font-bold">Experience & Leadership</h2>
+            <div className="flex space-x-2 mt-2 md:mt-0 md:ml-4">
               <button 
                 className={`${showContext ? 'bg-gray-800' : 'bg-gray-900'} hover:bg-gray-700 text-sm px-3 py-1 rounded-md`}
                 onClick={() => setShowContext(true)}
@@ -148,52 +172,53 @@ export default function About() {
           {showContext ? (
             <div className="space-y-6 bg-gray-900/50 backdrop-blur-md rounded-xl p-6">
               <div>
-              <p className="text-gray-300">
-  I&apos;m currently working at <span className="text-blue-400 hover:underline cursor-pointer">Wix</span>, specifically in the Analytics product.
-  We&apos;re helping people make informed decisions about their website.
-</p>
-              </div>
-
-              <div>
-              <p className="text-gray-300">
-  Also, I&apos;m the founding designer at <span className="text-blue-400 hover:underline cursor-pointer">Zorir</span> – an app to find professionals
-  by recommendations.
-</p>
-              </div>
-
-              <div>
-              <p className="text-gray-300">
-  Before Wix I designed <span className="text-blue-400 hover:underline cursor-pointer">OLX</span> – the most popular classifieds in Ukraine
-  with over 15M MAU. I worked on &quot;OLX Delivery,&quot; which is the part of
-  the product where buyers make purchases and sellers approve them.
-</p>
-              </div>
-
-              <div>
-              <p className="text-gray-300">
-  Before OLX I worked at <span className="text-blue-400 hover:underline cursor-pointer">ELEKS</span> – one of the biggest outsourcing
-  companies in Ukraine.
-</p>
-              </div>
-
-              <div>
                 <p className="text-gray-300">
-                  While working in ELEKS I briefly joined <span className="text-blue-400 hover:underline cursor-pointer">Finesweet</span> – a famous
-                  Webflow agency, where I designed a few projects.
+                  I founded <span className="text-blue-400 hover:underline cursor-pointer">S.T.A.R.S Non-Profit 501c3</span>, a student-run organization 
+                  dedicated to bridging the gap between students and professional industries. We provide hands-on training in advanced 
+                  technologies like CNC, 3D printing, and laser cutting. I've raised over $50,000 in funds and developed 
+                  a free online learning portal with interactive courses and resources.
                 </p>
               </div>
 
               <div>
                 <p className="text-gray-300">
-                  Before that I worked in <span className="text-blue-400 hover:underline cursor-pointer">dops.digital</span> – a design studio. This was my
-                  first full-time job.
+                  As Founder and Team Captain of <span className="text-blue-400 hover:underline cursor-pointer">FIRST Robotics Competition Robo-Colts #9478</span>,
+                  I led our team to the FIRST World Championship. I raised $70,000+ through grants and developed multiple computer 
+                  vision modules, power hubs, and algorithms for an 8 motor swerve odometry. We've now merged with 
+                  Harmony School of Innovation to create an advanced robotics program.
                 </p>
               </div>
 
               <div>
                 <p className="text-gray-300">
-                  Before joining dops.digital I freelanced for multiple years, mainly
-                  designing websites and simple interfaces.
+                  As Lead Programmer for <span className="text-blue-400 hover:underline cursor-pointer">FIRST Tech Challenge</span> teams,
+                  I developed my own integration of OpenCV Camera Vision with virtual spline mapping autonomous movement.
+                  Our teams achieved multiple league placements, advancement to state championship, and we were semifinalists 
+                  in the FIRST in Texas District Championship.
+                </p>
+              </div>
+
+              <div>
+                <p className="text-gray-300">
+                  I researched digital electronics at <span className="text-blue-400 hover:underline cursor-pointer">RICE University PATHS_UP</span> Young Scholars
+                  Electronics Internship, designing custom printed circuit boards (PCBs) and exploring correlation between 
+                  vitamin D deficiency and muscle tension. I also trained Image Python AI models with camera vision experts.
+                </p>
+              </div>
+
+              <div>
+                <p className="text-gray-300">
+                  At <span className="text-blue-400 hover:underline cursor-pointer">University of Houston I-TECH STEM Internship</span>, I served as 
+                  Modeling and Printing Manager, working with industrial 3D printers and modeling software to build prototypes.
+                  I also created AR/VR Custom Models of Amino Acid Compounds and worked with multi-material machines.
+                </p>
+              </div>
+
+              <div>
+                <p className="text-gray-300">
+                  With <span className="text-blue-400 hover:underline cursor-pointer">VentureStarters Business Internship</span>, I've been 
+                  learning the principles of pitching startups, acquiring funding, and the legal process. I've connected 
+                  with over 200 startup professionals through various technology and sciences events.
                 </p>
               </div>
             </div>
@@ -216,110 +241,163 @@ export default function About() {
           </div>
         </section>
 
-        {/* Recognition Section */}
+        {/* Projects Section */}
         <section className="max-w-6xl mx-auto p-4 md:p-8 mt-8">
-          <h2 className="text-2xl font-bold mb-6">Recognition 🏆</h2>
-          <div className="space-y-6 bg-gray-900/50 backdrop-blur-md rounded-xl p-6">
-            <div className="flex flex-col md:flex-row justify-between md:items-center">
-              <div className="text-gray-400 mb-2 md:mb-0">awwwards.</div>
-              <div className="text-left md:text-right">Young Jury (2020–now), x2 Honorable Mention</div>
+          <h2 className="text-2xl font-bold mb-6">Passion Projects 🚀</h2>
+          <div className="bg-gray-900/50 backdrop-blur-md rounded-xl p-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {projects.map((project, index) => (
+                <div key={index} className="flex items-start">
+                  <span className="text-blue-400 mr-2 mt-1">›</span>
+                  <p>{project}</p>
+                </div>
+              ))}
             </div>
-            
-            <div className="flex flex-col md:flex-row justify-between md:items-center">
-              <div className="flex items-center gap-2 mb-2 md:mb-0">
-                <div className="w-8 h-8 bg-gray-800 rounded-full flex items-center justify-center">P</div>
-                <span className="text-gray-400">Product Hunt</span>
-              </div>
-              <div className="text-left md:text-right">x3 Product of the Day</div>
-            </div>
-            
-            <div className="flex flex-col md:flex-row justify-between md:items-center">
-              <div className="text-gray-400 mb-2 md:mb-0">Figma</div>
-              <div className="text-left md:text-right">Plugins featured, grant recipient</div>
-            </div>
-            
-            <div className="flex flex-col md:flex-row justify-between md:items-center">
-              <div className="flex items-center gap-2 mb-2 md:mb-0">
-                <span className="text-gray-400">Webflow</span>
-              </div>
-              <div className="text-left md:text-right">Webflow Awards 2022 Finalist for companies.tools</div>
-            </div>
-            
-            <div className="flex flex-col md:flex-row justify-between md:items-center">
-              <div className="text-gray-400 mb-2 md:mb-0">CSSDesignAwards</div>
-              <div className="text-left md:text-right">Special Kudos for thepentool.co</div>
-            </div>
-            
-            <div className="flex flex-col md:flex-row justify-between md:items-center">
-              <div className="text-gray-400 mb-2 md:mb-0">Bēhance</div>
-              <div className="text-left md:text-right">x10 Behance Galleries</div>
-            </div>
-            
-            <div className="flex flex-col md:flex-row justify-between md:items-center">
-              <div className="flex items-center gap-2 mb-2 md:mb-0">
-                <span className="text-gray-400">Framer</span>
-              </div>
-              <div className="text-left md:text-right">Featured on Framer Showcase for 2022 CT Recap</div>
-            </div>
-            
-            <div className="flex flex-col md:flex-row justify-between md:items-center">
-              <div className="flex items-center gap-2 mb-2 md:mb-0">
-                <span className="text-gray-400">Awards</span>
-              </div>
-              <div className="text-left md:text-right">&quot;The Very Best Example of Website Design&quot;</div>            </div>
           </div>
         </section>
 
-        {/* Interests Section */}
+        {/* Recognition Section */}
         <section className="max-w-6xl mx-auto p-4 md:p-8 mt-8">
-          <h2 className="text-2xl font-bold mb-6">Cosmic Interests 🌌</h2>
+          <h2 className="text-2xl font-bold mb-6">Recognition & Awards 🏆</h2>
+          <div className="space-y-6 bg-gray-900/50 backdrop-blur-md rounded-xl p-6">
+            <div className="flex flex-col md:flex-row justify-between md:items-center">
+              <div className="text-gray-400 mb-2 md:mb-0">FIRST</div>
+              <div className="text-left md:text-right">2024 Dean's List World Championship Finalist</div>
+            </div>
+            
+            <div className="flex flex-col md:flex-row justify-between md:items-center">
+              <div className="text-gray-400 mb-2 md:mb-0">FRC</div>
+              <div className="text-left md:text-right">Rookie All-Star, Rookie Inspiration & World Championship Qualifier</div>
+            </div>
+            
+            <div className="flex flex-col md:flex-row justify-between md:items-center">
+              <div className="text-gray-400 mb-2 md:mb-0">TSA</div>
+              <div className="text-left md:text-right">National Conference Engineering Design Top 12, TX-Championship 1st Place</div>
+            </div>
+            
+            <div className="flex flex-col md:flex-row justify-between md:items-center">
+              <div className="text-gray-400 mb-2 md:mb-0">FTC</div>
+              <div className="text-left md:text-right">Semi-Finalist at Texas State Championship, Multiple Regional Awards</div>
+            </div>
+            
+            <div className="flex flex-col md:flex-row justify-between md:items-center">
+              <div className="text-gray-400 mb-2 md:mb-0">AFA CyberPatriot</div>
+              <div className="text-left md:text-right">Platinum Windows Server Award | Nationwide Cybersecurity Competition</div>
+            </div>
+            
+            <div className="flex flex-col md:flex-row justify-between md:items-center">
+              <div className="text-gray-400 mb-2 md:mb-0">Academic</div>
+              <div className="text-left md:text-right">AP Scholar Award, Presidential Gold Seal Award</div>
+            </div>
+          </div>
+        </section>
+
+        {/* Skills Section */}
+        <section className="max-w-6xl mx-auto p-4 md:p-8 mt-8">
+          <h2 className="text-2xl font-bold mb-6">Technical Skills 🛠️</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="bg-gray-900/50 backdrop-blur-md rounded-xl p-6">
               <h3 className="text-xl font-semibold mb-4 flex items-center">
-                <span className="mr-2">🚀</span>
-                Space Exploration Technologies
+                <span className="mr-2">💻</span>
+                Programming & Development
               </h3>
               <ul className="space-y-2">
                 <li className="flex items-center">
                   <span className="text-blue-400 mr-2">›</span>
-                  Spacecraft propulsion systems
+                  Python (Certified), Machine Learning
                 </li>
                 <li className="flex items-center">
                   <span className="text-blue-400 mr-2">›</span>
-                  Orbital mechanics simulations
+                  JavaScript, TypeScript, React, Node.js
                 </li>
                 <li className="flex items-center">
                   <span className="text-blue-400 mr-2">›</span>
-                  Deep space communication networks
+                  Java (Certified), C++, Flutter
                 </li>
                 <li className="flex items-center">
                   <span className="text-blue-400 mr-2">›</span>
-                  Habitation modules for extended missions
+                  HTML, CSS, Full Stack Development
                 </li>
               </ul>
             </div>
             
             <div className="bg-gray-900/50 backdrop-blur-md rounded-xl p-6">
               <h3 className="text-xl font-semibold mb-4 flex items-center">
-                <span className="mr-2">🔭</span>
-                Astrophysics & Astronomy
+                <span className="mr-2">🔧</span>
+                Engineering & Design
               </h3>
               <ul className="space-y-2">
                 <li className="flex items-center">
                   <span className="text-blue-400 mr-2">›</span>
-                  Black hole event horizons
+                  3D Modeling & Printing (Industrial)
                 </li>
                 <li className="flex items-center">
                   <span className="text-blue-400 mr-2">›</span>
-                  Exoplanet discovery techniques
+                  CNC Machining & Laser Cutting
                 </li>
                 <li className="flex items-center">
                   <span className="text-blue-400 mr-2">›</span>
-                  Relativistic effects at galactic scales
+                  Robotics Design & Construction
                 </li>
                 <li className="flex items-center">
                   <span className="text-blue-400 mr-2">›</span>
-                  Stellar evolution patterns
+                  PCB Design & Electronics
+                </li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        {/* Additional Interests Section */}
+        <section className="max-w-6xl mx-auto p-4 md:p-8 mt-8">
+          <h2 className="text-2xl font-bold mb-6">Additional Interests 🌟</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="bg-gray-900/50 backdrop-blur-md rounded-xl p-6">
+              <h3 className="text-xl font-semibold mb-4 flex items-center">
+                <span className="mr-2">💃</span>
+                Dance & Performance
+              </h3>
+              <ul className="space-y-2">
+                <li className="flex items-center">
+                  <span className="text-blue-400 mr-2">›</span>
+                  NAACH Bollywood Dance Institute (Performance Team A)
+                </li>
+                <li className="flex items-center">
+                  <span className="text-blue-400 mr-2">›</span>
+                  Harmony Fusion Arts Dance Team (Co-Captain)
+                </li>
+                <li className="flex items-center">
+                  <span className="text-blue-400 mr-2">›</span>
+                  Performed at Miller Outdoor Theatre & Discovery Green
+                </li>
+                <li className="flex items-center">
+                  <span className="text-blue-400 mr-2">›</span>
+                  Choreographer for multiple productions
+                </li>
+              </ul>
+            </div>
+            
+            <div className="bg-gray-900/50 backdrop-blur-md rounded-xl p-6">
+              <h3 className="text-xl font-semibold mb-4 flex items-center">
+                <span className="mr-2">🎯</span>
+                Other Pursuits
+              </h3>
+              <ul className="space-y-2">
+                <li className="flex items-center">
+                  <span className="text-blue-400 mr-2">›</span>
+                  Investment Portfolio Management
+                </li>
+                <li className="flex items-center">
+                  <span className="text-blue-400 mr-2">›</span>
+                  Archery (Boy Scouts of America)
+                </li>
+                <li className="flex items-center">
+                  <span className="text-blue-400 mr-2">›</span>
+                  Table Tennis (8+ years experience)
+                </li>
+                <li className="flex items-center">
+                  <span className="text-blue-400 mr-2">›</span>
+                  PC Building & Component Customization
                 </li>
               </ul>
             </div>
@@ -493,31 +571,34 @@ export default function About() {
         </Link>
       </motion.div>
 
-
-
-
-      
-
       {/* Neptune Visualization - Bottom right corner */}
       <motion.div
         className="fixed bottom-1/2 right-16 w-24 h-24 rounded-full"
         initial={{ opacity: 0 }}
-        animate={{ opacity: 0.6 }}
-        transition={{ delay: 1, duration: 2 }}
+        animate={{ 
+          opacity: [0.6, 0.8, 0.6], 
+          scale: [1, 1.03, 1],
+        }}
+        transition={{ 
+          duration: 8,
+          repeat: Infinity,
+          repeatType: "reverse",
+        }}
         style={{
-          background: "radial-gradient(circle, #2B6CB0 0%, #1A365D 70%, #0F172A 100%)",
-          boxShadow: "0 0 20px rgba(43, 108, 176, 0.5)",
-          filter: "blur(1px)"
+          background: "radial-gradient(circle, #00BFFF 0%, #1E40AF 100%)",
+          boxShadow: "0 0 20px rgba(0, 191, 255, 0.7)",
+          transform: "translateY(-50%)"
         }}
       >
-        <motion.div
-          className="absolute inset-0 rounded-full"
-          style={{
-            background: "linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.1) 50%, transparent 100%)",
-          }}
-          animate={{ rotate: 360 }}
-          transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
-        />
+        <div className="w-full h-full rounded-full relative overflow-hidden">
+          <div className="absolute w-full h-full bg-blue-900 opacity-20" 
+            style={{
+              backgroundImage: "linear-gradient(0deg, transparent 0%, #164e63 100%)"
+            }}
+          ></div>
+          <div className="absolute w-8 h-3 bg-cyan-200 opacity-30 rounded-full top-3 left-3 blur-sm"></div>
+          <div className="absolute w-6 h-2 bg-cyan-200 opacity-20 rounded-full bottom-5 right-7 blur-sm"></div>
+        </div>
       </motion.div>
     </div>
   );
