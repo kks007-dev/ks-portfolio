@@ -38,7 +38,7 @@ interface ChangelogItem {
 export default function Page(): JSX.Element {
   // Use state with explicit initial values to prevent hydration issues
   const [selectedTab, setSelectedTab] = useState<string>('Work');
-  const [scrollProgress, setScrollProgress] = useState<number>(0);
+  //const [scrollProgress, setScrollProgress] = useState<number>(0);
   const [hoveredCard, setHoveredCard] = useState<number | null>(null);
   const [selectedProject, setSelectedProject] = useState<number | null>(null);
   const [projectsVisible, setProjectsVisible] = useState<boolean>(false);
@@ -61,13 +61,13 @@ export default function Page(): JSX.Element {
     
     const handleScroll = () => {
       if (bannerRef.current) {
-        const scrollY = window.scrollY;
-        const triggerPoint = 100; // Start fading after scrolling this many pixels
-        const fadeDistance = 300; // Complete fade over this distance
+        //const scrollY = window.scrollY;
+        //const triggerPoint = 100; // Start fading after scrolling this many pixels
+        //const fadeDistance = 300; // Complete fade over this distance
         
         // Calculate fade progress (0 to 1)
-        const progress = Math.min(Math.max((scrollY - triggerPoint) / fadeDistance, 0), 1);
-        setScrollProgress(progress);
+        //const progress = Math.min(Math.max((scrollY - triggerPoint) / fadeDistance, 0), 1);
+        //setScrollProgress(progress);
       }
       
       // Trigger projects visibility when user scrolls past a certain point
@@ -737,7 +737,7 @@ export default function Page(): JSX.Element {
                     )}
 
                     {/* Feature Nodes (Constellation Points) */}
-                    {projectFeatures.map((feature, index) => (
+                    {projectFeatures.map((feature) => (
                       <div
                         key={feature.id}
                         className="constellation-point bg-gray-800 p-3 rounded-lg text-white text-sm text-center pulse"
@@ -773,8 +773,7 @@ export default function Page(): JSX.Element {
               <ul className="space-y-4">
                 {changelog.map((entry, index) => (
                   <li key={index} className="text-gray-300">
-                    <span className="text-gray-500 font-mono text-sm mr-2">// {entry.date}</span>
-                    <span>{entry.content}</span>
+{/* <span className="text-gray-500 font-mono text-sm mr-2">// {entry.date}</span> */}                    <span>{entry.content}</span>
                     {entry.link && (
                       <span className="ml-1 text-indigo-400 hover:underline cursor-pointer">
                         {entry.link}

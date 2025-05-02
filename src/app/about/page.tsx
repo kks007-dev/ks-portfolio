@@ -12,13 +12,13 @@ export default function About() {
 
   // Handle keyboard events for email reveal
   useEffect(() => {
-    const handleKeyDown = (e:any) => {
+    const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key.toLowerCase() === "e") {
         setShowEmail(true);
       }
     };
-
-    const handleKeyUp = (e:any) => {
+  
+    const handleKeyUp = (e: KeyboardEvent) => {
       if (e.key.toLowerCase() === "e") {
         setShowEmail(false);
       }
@@ -129,8 +129,7 @@ export default function About() {
         {/* Work Experience Section */}
         <section className="max-w-6xl mx-auto p-4 md:p-8 mt-8">
           <div className="flex flex-col md:flex-row md:items-center gap-2 mb-6">
-            <h2 className="text-2xl font-bold">Where I've worked</h2>
-            <div className="flex space-x-2 mt-2 md:mt-0 md:ml-4">
+          <h2 className="text-2xl font-bold">Where I&apos;ve worked</h2>            <div className="flex space-x-2 mt-2 md:mt-0 md:ml-4">
               <button 
                 className={`${showContext ? 'bg-gray-800' : 'bg-gray-900'} hover:bg-gray-700 text-sm px-3 py-1 rounded-md`}
                 onClick={() => setShowContext(true)}
@@ -149,32 +148,32 @@ export default function About() {
           {showContext ? (
             <div className="space-y-6 bg-gray-900/50 backdrop-blur-md rounded-xl p-6">
               <div>
-                <p className="text-gray-300">
-                  I'm currently working at <span className="text-blue-400 hover:underline cursor-pointer">Wix</span>, specifically in the Analytics product.
-                  We're helping people make informed decisions about their website.
-                </p>
+              <p className="text-gray-300">
+  I&apos;m currently working at <span className="text-blue-400 hover:underline cursor-pointer">Wix</span>, specifically in the Analytics product.
+  We&apos;re helping people make informed decisions about their website.
+</p>
               </div>
 
               <div>
-                <p className="text-gray-300">
-                  Also, I'm the founding designer at <span className="text-blue-400 hover:underline cursor-pointer">Zorir</span> – an app to find professionals
-                  by recommendations.
-                </p>
+              <p className="text-gray-300">
+  Also, I&apos;m the founding designer at <span className="text-blue-400 hover:underline cursor-pointer">Zorir</span> – an app to find professionals
+  by recommendations.
+</p>
               </div>
 
               <div>
-                <p className="text-gray-300">
-                  Before Wix I designed <span className="text-blue-400 hover:underline cursor-pointer">OLX</span> – the most popular classifieds in Ukraine
-                  with over 15M MAU. I worked on "OLX Delivery," which is the part of
-                  the product where buyers make purchases and sellers approve them.
-                </p>
+              <p className="text-gray-300">
+  Before Wix I designed <span className="text-blue-400 hover:underline cursor-pointer">OLX</span> – the most popular classifieds in Ukraine
+  with over 15M MAU. I worked on &quot;OLX Delivery,&quot; which is the part of
+  the product where buyers make purchases and sellers approve them.
+</p>
               </div>
 
               <div>
-                <p className="text-gray-300">
-                  Before OLX I worked at <span className="text-blue-400 hover:underline cursor-pointer">ELEKS</span> – one of the biggest outsourcing
-                  companies in Ukraine.
-                </p>
+              <p className="text-gray-300">
+  Before OLX I worked at <span className="text-blue-400 hover:underline cursor-pointer">ELEKS</span> – one of the biggest outsourcing
+  companies in Ukraine.
+</p>
               </div>
 
               <div>
@@ -267,8 +266,7 @@ export default function About() {
               <div className="flex items-center gap-2 mb-2 md:mb-0">
                 <span className="text-gray-400">Awards</span>
               </div>
-              <div className="text-left md:text-right">"The Very Best Example of Website Design"</div>
-            </div>
+              <div className="text-left md:text-right">&quot;The Very Best Example of Website Design&quot;</div>            </div>
           </div>
         </section>
 
